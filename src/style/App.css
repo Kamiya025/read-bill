@@ -1,0 +1,125 @@
+.App {
+  text-align: center;
+  background-color: rgb(255, 253, 186);
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+.container {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  justify-items: center;
+}
+.container > .title {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.container > .content {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
+.content > ul {
+  background-color: #61dafb22;
+  display: grid;
+  padding: 25px;
+  box-shadow: #282c34;
+  width: 450px;
+  border-radius: 20px;
+}
+.body {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  justify-content: center;
+}
+.body .line {
+  width: 500px;
+  border: 1;
+  height: 2px;
+  background-color: #61dafb;
+  margin: 25px auto 25px auto;
+}
+.content > ul > li {
+  display: grid;
+  grid-template-columns: 200px 250px;
+  gap: 10px;
+}
+.content > ul > li > .erorr {
+  color: #f40a0e;
+}
+.content > ul > li > span:first {
+  padding: 5px;
+  text-align: left;
+}
+.content > ul > li > span:last-child {
+  padding: 5px;
+  text-align: right;
+}
+.content > ul > li > b {
+  padding: 5px;
+  text-align: left;
+  font-size: 1.1rem;
+}
+.submit {
+  padding: 12px;
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  background-color: #01a348;
+  color: azure;
+  border: 0;
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.submit:hover {
+  background-color: #03c256;
+}
+.submit:active {
+  background-color: #027936;
+}
+.input {
+  background-color: "#fff000";
+  padding: 18;
+  border: 2;
+  border-style: "dashed";
+  border-radius: 10;
+  height: "100px";
+  width: "500px";
+}
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
