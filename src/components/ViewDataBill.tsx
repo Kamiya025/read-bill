@@ -5,8 +5,9 @@ function GetDataBillWrapper(props: { params?: IBill }) {
   if (props.params) return <ViewBill params={props.params} />
   return <></>
 }
-function covertCode(code: number) {
-  switch (code) {
+function covertCode(code: number, status?: number) {
+  if (code === 0) return "Hóa đơn không tồn tại"
+  switch (status) {
     case 0:
       return "Hóa đơn không tồn tại"
     case 1:
@@ -34,7 +35,12 @@ const ViewBill = (props: { params: IBill }) => {
         <div className="container">
           <div className="title">Thông tin kiểm tra hóa đơn</div>
           <div className="content">
-            <ul>{covertCode(getDataBySubmission.data.hddt?.code)}</ul>
+            <ul>
+              {covertCode(
+                getDataBySubmission.data.hddt?.code,
+                getDataBySubmission.data.hddt?.status
+              )}
+            </ul>
           </div>
           <div className="content">
             <ul>

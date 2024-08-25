@@ -101,4 +101,5 @@ interface Nnt {
 
 interface Hddt {
   code: number
+  status?: number
 }
