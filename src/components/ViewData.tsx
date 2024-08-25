@@ -299,7 +299,7 @@ const Input = (props: {
     <label>
       <b>{props.label}</b>
       <div>
-        {props.score <= 0.9 || !props.value ? (
+        {props.score <= 0.9 || !props.defaultValue ? (
           <input
             type={props.type}
             value={props.value}
