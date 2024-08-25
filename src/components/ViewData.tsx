@@ -83,6 +83,12 @@ function GetDataWrapper(props: { submissionID: string }) {
             tgtttbso: output["invoice_data.sub_total"].confidence_score ?? 0,
           },
         })
+        console.log({
+          nbmst: output["supplier_data.tax_code"],
+          khhdon: output["invoice_data.serial_no"],
+          shdon: output["invoice_data.invoice_no"],
+          tgtttbso: output["invoice_data.sub_total"],
+        })
       } else {
         queryClient.invalidateQueries({
           queryKey: allKeys.getDataBySubmissionID(props.submissionID),
@@ -205,7 +211,7 @@ const ViewBill = (props: {
                         },
                       }))
                   }}
-                  score={dataSetConfidenceScore.nbmst}
+                  score={dataSetConfidenceScore.khhdon}
                 />
               </li>
               <li>
@@ -222,7 +228,7 @@ const ViewBill = (props: {
                       },
                     }))
                   }}
-                  score={dataSetConfidenceScore.nbmst}
+                  score={dataSetConfidenceScore.khhdon}
                 />
               </li>
               <li>
@@ -239,7 +245,7 @@ const ViewBill = (props: {
                       },
                     }))
                   }}
-                  score={dataSetConfidenceScore.nbmst}
+                  score={dataSetConfidenceScore.shdon}
                 />
               </li>
               <li>
@@ -257,7 +263,7 @@ const ViewBill = (props: {
                       },
                     }))
                   }}
-                  score={dataSetConfidenceScore.nbmst}
+                  score={dataSetConfidenceScore.tgtttbso}
                 />
               </li>
               <button
@@ -299,12 +305,14 @@ const Input = (props: {
     <label>
       <b>{props.label}</b>
       <div>
-        {props.score <= 0.9 || !props.defaultValue ? (
+        {props.score <= 0.95 || !props.defaultValue ? (
           <input
             type={props.type}
             value={props.value}
             className={`input-bill ${
-              (props.message || props.score < 0.95) && "input-bill-err"
+              (props.message ||
+                (props.score < 0.9 && props.value === props.value)) &&
+              "input-bill-err"
             }`}
             onChange={(e) => {
               props.onChange(e.currentTarget.value)
