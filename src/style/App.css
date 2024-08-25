@@ -67,18 +67,27 @@
   margin: 25px auto 25px auto;
 }
 .content > ul > li {
+  display: block;
+}
+.content > ul > li > label {
   display: grid;
   grid-template-columns: 200px 250px;
   gap: 10px;
 }
-.content > ul > li > .erorr {
+.content > ul > li > label > .erorr {
   color: #f40a0e;
 }
-.content > ul > li > span:first {
+.content > ul > li > label > b {
   padding: 5px;
   text-align: left;
 }
-.content > ul > li > span:last-child {
+.content > ul > li > label > span:last-child {
+  padding: 5px;
+  text-align: right;
+}
+.content > ul > li > label > div {
+  display: flex;
+  flex-direction: column;
   padding: 5px;
   text-align: right;
 }
@@ -114,6 +123,28 @@
   border-radius: 10;
   height: "100px";
   width: "500px";
+}
+.input-bill {
+  display: inline-block;
+  border-style: hidden hidden solid hidden;
+  padding: 8px 8px 6px 8px;
+  text-align: right;
+  background: none;
+  border-color: #737272;
+  border-bottom-width: 1px;
+}
+.input-bill:focus {
+  outline: none;
+  border-color: #0a68f4;
+  color: #0a68f4;
+}
+.input-bill-err {
+  border-color: #f40a0e;
+  color: #f40a0e;
+}
+.err {
+  color: #f40a0e;
+  font-size: 12px;
 }
 @keyframes App-logo-spin {
   from {

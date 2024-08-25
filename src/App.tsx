@@ -15,6 +15,7 @@ function App() {
     if (!file) {
       alert("Please select a file first!")
       setSubmissionID(undefined)
+      setFile(undefined)
       return
     }
     const formData = new FormData()
@@ -41,6 +42,15 @@ function App() {
             margin: 10,
           }}
         />
+        <div>
+          {/* {file && (
+            <img
+              src={URL.createObjectURL(file)}
+              alt="Uploaded file preview"
+              style={{ width: "200px" }}
+            />
+          )} */}
+        </div>
       </label>
 
       {submissionID && <GetDataWrapper submissionID={submissionID} />}

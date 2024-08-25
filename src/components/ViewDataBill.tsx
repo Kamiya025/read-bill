@@ -40,8 +40,10 @@ const ViewBill = (props: { params: IBill }) => {
             <ul>
               {getDataBySubmission.data.nnt?.map((item, index) => (
                 <li key={index}>
-                  <b>{item.key}</b>
-                  <span>{item.value}</span>
+                  <label>
+                    <b>{item.key}</b>
+                    <span>{item.value}</span>
+                  </label>
                 </li>
               ))}
             </ul>

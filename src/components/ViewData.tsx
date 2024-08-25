@@ -1,10 +1,22 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { allKeys, useGetData } from "../api/query"
-import { IBill, IBillConfidenceScore } from "../api/model"
+import { IBill, IBillConfidenceScore, IBillMessageError } from "../api/model"
 import GetDataBillWrapper from "./ViewDataBill"
 
-function traverseDataSets(dataSets: any, tag: any, output: any) {
+function traverseDataSets(
+  dataSets: any,
+  tag: any,
+  output: {
+    [key: string]: {
+      value: string
+      normalized_value: any
+      label: string
+      display_name: string
+      confidence_score: number
+    }
+  }
+) {
   for (let dataSet of dataSets) {
     let { service_label, data_set, value, normalized_value, confidence_score } =
       dataSet
@@ -12,22 +24,29 @@ function traverseDataSets(dataSets: any, tag: any, output: any) {
     let newTag = tag ? `${tag}.${label}` : label
     if (data_set) traverseDataSets(data_set, newTag, output)
     else
-      output[newTag] = { value, normalized_value, label: newTag, display_name }
+      output[newTag] = {
+        value,
+        normalized_value,
+        label: newTag,
+        display_name,
+        confidence_score,
+      }
   }
 }
 
 function GetDataWrapper(props: { submissionID: string }) {
-  const [dataSet, setDataSet] = useState<IBill | undefined>(undefined)
-  const [dataSetConfidenceScore, setDataSetConfidenceScore] =
-    useState<IBillConfidenceScore>({
+  const [dataSet, setDataSet] = useState<{
+    data?: IBill
+    submit?: IBill
+    score: IBillConfidenceScore
+  }>({
+    score: {
       nbmst: 1,
       khhdon: 1,
       shdon: 1,
       tgtttbso: 1,
-    })
-  const [dataSetSubmit, setDataSetSubmit] = useState<IBill | undefined>(
-    undefined
-  )
+    },
+  })
   const getDataBySubmission = useGetData(props.submissionID)
   const debounce = 3000
   const queryClient = useQueryClient()
@@ -49,16 +68,20 @@ function GetDataWrapper(props: { submissionID: string }) {
         let output = Object.create(null)
         traverseDataSets(dataSets, undefined, output)
         setDataSet({
-          nbmst: output["supplier_data.tax_code"].value,
-          khhdon: output["invoice_data.serial_no"].value?.substring(1),
-          shdon: output["invoice_data.invoice_no"].value,
-          tgtttbso: Math.floor(Number(output["invoice_data.sub_total"].value)),
-        })
-        setDataSetConfidenceScore({
-          nbmst: output["supplier_data.tax_code"].confidence_score ?? 1,
-          khhdon: output["invoice_data.serial_no"].confidence_score ?? 1,
-          shdon: output["invoice_data.invoice_no"].confidence_score ?? 1,
-          tgtttbso: output["invoice_data.sub_total"].confidence_score ?? 1,
+          data: {
+            nbmst: output["supplier_data.tax_code"].value,
+            khhdon: output["invoice_data.serial_no"].value?.substring(1),
+            shdon: output["invoice_data.invoice_no"].value,
+            tgtttbso: String(
+              Math.floor(Number(output["invoice_data.sub_total"].value))
+            ),
+          },
+          score: {
+            nbmst: output["supplier_data.tax_code"].confidence_score ?? 0,
+            khhdon: output["invoice_data.serial_no"].confidence_score ?? 0,
+            shdon: output["invoice_data.invoice_no"].confidence_score ?? 0,
+            tgtttbso: output["invoice_data.sub_total"].confidence_score ?? 0,
+          },
         })
       } else {
         queryClient.invalidateQueries({
@@ -88,12 +111,12 @@ function GetDataWrapper(props: { submissionID: string }) {
     return (
       <div className="body">
         <ViewBill
-          dataSet={dataSet}
-          submit={() => setDataSetSubmit(dataSet)}
-          dataSetConfidenceScore={dataSetConfidenceScore}
+          dataSet={dataSet.data}
+          submit={(submit) => setDataSet((pre) => ({ ...pre, submit }))}
+          dataSetConfidenceScore={dataSet.score}
         />
 
-        <GetDataBillWrapper params={dataSetSubmit} />
+        <GetDataBillWrapper params={dataSet.submit} />
       </div>
     )
   }
@@ -102,10 +125,37 @@ function GetDataWrapper(props: { submissionID: string }) {
 const ViewBill = (props: {
   dataSet?: IBill
   dataSetConfidenceScore: IBillConfidenceScore
-  submit: () => void
+  submit: (data: IBill) => void
 }) => {
   const { dataSet, dataSetConfidenceScore } = props
-  if (dataSet)
+  const [dataSetSubmit, setDataSetSubmit] = useState<{
+    data?: IBill
+  }>({
+    data: {
+      nbmst: dataSet?.nbmst ?? "",
+      khhdon: dataSet?.khhdon ?? "",
+      shdon: dataSet?.shdon ?? "",
+      tgtttbso: dataSet?.tgtttbso ?? "",
+    },
+  })
+  const dataDefault: IBill = {
+    nbmst: "",
+    khhdon: "",
+    shdon: "",
+    tgtttbso: "",
+  }
+  useEffect(() => {
+    setDataSetSubmit((pre) => ({
+      ...pre,
+      data: {
+        nbmst: dataSet?.nbmst ?? "",
+        khhdon: dataSet?.khhdon ?? "",
+        shdon: dataSet?.shdon ?? "",
+        tgtttbso: dataSet?.tgtttbso ?? "",
+      },
+    }))
+  }, [props.dataSet])
+  if (dataSet) {
     return (
       <>
         <div className="container border">
@@ -113,56 +163,119 @@ const ViewBill = (props: {
           <div className="content">
             <ul>
               <li>
-                <b>Mã số thuế</b>
-                <span
-                  className={
-                    dataSetConfidenceScore?.nbmst < 0.95 ? "erorr" : ""
-                  }
-                >
-                  {dataSet?.nbmst}
-                </span>
+                <Input
+                  label="Mã số thuế"
+                  value={dataSetSubmit.data?.nbmst}
+                  defaultValue={dataSet?.nbmst}
+                  onChange={(data) => {
+                    setDataSetSubmit((pre) => ({
+                      ...pre,
+                      data: {
+                        ...(pre.data ?? dataDefault),
+                        nbmst: data,
+                      },
+                    }))
+                  }}
+                  score={dataSetConfidenceScore.nbmst}
+                />
               </li>
               <li>
-                <b>Loại Hóa đơn</b>
-                <span
-                  className={
-                    dataSetConfidenceScore?.khhdon < 0.95 ? "erorr" : ""
-                  }
-                >
-                  {dataSet?.khhdon?.charAt(0)}
-                </span>
+                <Input
+                  label="Loại Hóa đơn"
+                  value={dataSetSubmit.data?.khhdon?.charAt(0)}
+                  defaultValue={dataSet?.khhdon?.charAt(0)}
+                  onChange={(data) => {
+                    if (data.trim()) {
+                      setDataSetSubmit((pre) => ({
+                        ...pre,
+                        data: {
+                          ...(pre.data ?? dataDefault),
+                          khhdon: (
+                            (data.length > 1 ? data.charAt(1) : data) +
+                            pre.data?.khhdon.substring(1)
+                          ).toUpperCase(),
+                        },
+                      }))
+                    } else
+                      setDataSetSubmit((pre) => ({
+                        ...pre,
+                        data: {
+                          ...(pre.data ?? dataDefault),
+                          khhdon: "",
+                        },
+                      }))
+                  }}
+                  score={dataSetConfidenceScore.nbmst}
+                />
               </li>
               <li>
-                <b>Ký hiệu Hóa đơn</b>
-                <span
-                  className={
-                    dataSetConfidenceScore?.khhdon < 0.95 ? "erorr" : ""
-                  }
-                >
-                  {dataSet?.khhdon?.charAt(1)}
-                </span>
+                <Input
+                  label="Ký hiệu Hóa đơn"
+                  value={dataSetSubmit.data?.khhdon?.substring(1)}
+                  defaultValue={dataSet?.khhdon?.substring(1)}
+                  onChange={(data) => {
+                    setDataSetSubmit((pre) => ({
+                      ...pre,
+                      data: {
+                        ...(pre.data ?? dataDefault),
+                        khhdon: pre.data?.khhdon.charAt(0) + data,
+                      },
+                    }))
+                  }}
+                  score={dataSetConfidenceScore.nbmst}
+                />
               </li>
               <li>
-                <b>Số hóa đơn</b>
-                <span
-                  className={
-                    dataSetConfidenceScore?.shdon < 0.95 ? "erorr" : ""
-                  }
-                >
-                  {dataSet?.shdon}
-                </span>
+                <Input
+                  label="Số hóa đơn"
+                  value={dataSetSubmit.data?.shdon}
+                  defaultValue={dataSet?.shdon}
+                  onChange={(data) => {
+                    setDataSetSubmit((pre) => ({
+                      ...pre,
+                      data: {
+                        ...(pre.data ?? dataDefault),
+                        shdon: pre.data?.khhdon?.charAt(0) + data,
+                      },
+                    }))
+                  }}
+                  score={dataSetConfidenceScore.nbmst}
+                />
               </li>
               <li>
-                <b>Tổng số tiền thanh toán</b>
-                <span
-                  className={
-                    dataSetConfidenceScore?.tgtttbso < 0.95 ? "erorr" : ""
-                  }
-                >
-                  {dataSet?.tgtttbso}
-                </span>
+                <Input
+                  type="number"
+                  label="Tổng số tiền thanh toán"
+                  value={dataSetSubmit.data?.tgtttbso}
+                  defaultValue={dataSet?.tgtttbso}
+                  onChange={(data) => {
+                    setDataSetSubmit((pre) => ({
+                      ...pre,
+                      data: {
+                        ...(pre.data ?? dataDefault),
+                        tgtttbso: data,
+                      },
+                    }))
+                  }}
+                  score={dataSetConfidenceScore.nbmst}
+                />
               </li>
-              <button type="button" className="submit" onClick={props.submit}>
+              <button
+                type="button"
+                className="submit"
+                onClick={() => {
+                  console.log(dataSetSubmit.data)
+                  if (
+                    dataSetSubmit.data &&
+                    dataSetSubmit.data.nbmst &&
+                    dataSetSubmit.data.khhdon &&
+                    dataSetSubmit.data.shdon &&
+                    dataSetSubmit.data.tgtttbso
+                  ) {
+                    props.submit(dataSetSubmit.data)
+                  }
+                }}
+              >
                 Tra cứu
               </button>
             </ul>
@@ -170,6 +283,39 @@ const ViewBill = (props: {
         </div>
       </>
     )
+  }
   return <></>
+}
+const Input = (props: {
+  type?: "text" | "number"
+  label: string
+  value: string | undefined
+  defaultValue: string | undefined
+  onChange: (data: string) => void
+  message?: string
+  score: number
+}) => {
+  return (
+    <label>
+      <b>{props.label}</b>
+      <div>
+        {props.score <= 0.9 || !props.value ? (
+          <input
+            type={props.type}
+            value={props.value}
+            className={`input-bill ${
+              (props.message || props.score < 0.95) && "input-bill-err"
+            }`}
+            onChange={(e) => {
+              props.onChange(e.currentTarget.value)
+            }}
+            required
+          />
+        ) : (
+          props.value
+        )}
+      </div>
+    </label>
+  )
 }
 export default GetDataWrapper

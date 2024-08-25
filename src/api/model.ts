@@ -72,7 +72,14 @@ export interface IBill {
   nbmst: string
   khhdon: string
   shdon: string
-  tgtttbso: number
+  tgtttbso: string
+}
+export interface IBillMessageError {
+  nbmst?: string
+  khhdon_first?: string
+  khhdon_last?: string
+  shdon?: string
+  tgtttbso?: string
 }
 export interface IBillConfidenceScore {
   nbmst: number
