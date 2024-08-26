@@ -75,15 +75,21 @@ function GetDataWrapper(props: { submissionID: string }) {
             khhdon_last:
               output["invoice_data.serial_no"].value?.substring(1) ?? "",
             shdon: output["invoice_data.invoice_no"].value ?? "",
-            tgtttbso: String(
-              Math.floor(Number(output["invoice_data.sub_total"].value))
-            ),
+            tgtttbso: output["invoice_data.total_amount"].value
+              ? String(
+                  Math.floor(Number(output["invoice_data.total_amount"].value))
+                )
+              : String(
+                  Math.floor(Number(output["invoice_data.sub_total"].value))
+                ),
           },
           score: {
             nbmst: output["supplier_data.tax_code"].confidence_score ?? 0,
             khhdon: output["invoice_data.serial_no"].confidence_score ?? 0,
             shdon: output["invoice_data.invoice_no"].confidence_score ?? 0,
-            tgtttbso: output["invoice_data.sub_total"].confidence_score ?? 0,
+            tgtttbso: output["invoice_data.total_amount"].value
+              ? output["invoice_data.total_amount"].confidence_score ?? 0
+              : output["invoice_data.sub_total"].confidence_score ?? 0,
           },
         })
       } else {
