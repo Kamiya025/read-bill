@@ -56,7 +56,7 @@ interface File {
 }
 
 interface Document {
-  id: null
+  id: string
   page_set: string[]
   submission: string
   data_set: any
@@ -103,4 +103,13 @@ interface Nnt {
 interface Hddt {
   code: number
   status?: number
+  reason: string
+  desc: string
+  updatedDate: string
+  statusDesc: string
+  refInvoice: {
+    EInvoiceNo: string
+    EInvoiceCode: string
+    EInvoiceNoCode: string
+  }[]
 }

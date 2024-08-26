@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
+import { IBill, IBillConfidenceScore } from "../api/model"
 import { allKeys, useGetData } from "../api/query"
-import { IBill, IBillConfidenceScore, IBillMessageError } from "../api/model"
 import GetDataBillWrapper from "./ViewDataBill"
 
 function traverseDataSets(
@@ -54,14 +54,14 @@ function GetDataWrapper(props: { submissionID: string }) {
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined
 
-    if (getDataBySubmission.data?.status === "processing") {
+    if (!getDataBySubmission.data?.documents[0]?.data_set) {
       interval = setInterval(() => {
         getDataBySubmission.refetch()
       }, debounce)
     } else {
       if (
         getDataBySubmission.data &&
-        getDataBySubmission.data.status != "processing"
+        getDataBySubmission.data.documents[0]?.data_set
       ) {
         let document = getDataBySubmission.data.documents[0]
         let dataSets = document.data_set
@@ -69,10 +69,12 @@ function GetDataWrapper(props: { submissionID: string }) {
         traverseDataSets(dataSets, undefined, output)
         setDataSet({
           data: {
-            nbmst: output["supplier_data.tax_code"].value,
-            khhdon_first: output["invoice_data.serial_no"].value?.charAt(0),
-            khhdon_last: output["invoice_data.serial_no"].value?.substring(1),
-            shdon: output["invoice_data.invoice_no"].value,
+            nbmst: output["supplier_data.tax_code"].value ?? "",
+            khhdon_first:
+              output["invoice_data.serial_no"].value?.charAt(0) ?? "",
+            khhdon_last:
+              output["invoice_data.serial_no"].value?.substring(1) ?? "",
+            shdon: output["invoice_data.invoice_no"].value ?? "",
             tgtttbso: String(
               Math.floor(Number(output["invoice_data.sub_total"].value))
             ),
@@ -83,12 +85,6 @@ function GetDataWrapper(props: { submissionID: string }) {
             shdon: output["invoice_data.invoice_no"].confidence_score ?? 0,
             tgtttbso: output["invoice_data.sub_total"].confidence_score ?? 0,
           },
-        })
-        console.log({
-          nbmst: output["supplier_data.tax_code"],
-          khhdon: output["invoice_data.serial_no"],
-          shdon: output["invoice_data.invoice_no"],
-          tgtttbso: output["invoice_data.sub_total"],
         })
       } else {
         queryClient.invalidateQueries({
@@ -102,12 +98,12 @@ function GetDataWrapper(props: { submissionID: string }) {
   }, [getDataBySubmission.data, getDataBySubmission.refetch])
   if (
     getDataBySubmission.isLoading ||
-    getDataBySubmission.data?.status === "processing"
+    !getDataBySubmission.data?.documents[0]?.data_set
   )
     return (
       <>
         <div>Đang lấy dữ liệu...</div>
-        {getDataBySubmission.data?.status === "processing" && (
+        {!getDataBySubmission.data?.documents[0]?.id && (
           <div>Đang quét dữ liệu, vui lòng đợi hệ thống xử lý...</div>
         )}
       </>
@@ -200,10 +196,12 @@ const ViewBill = (props: {
                         ...pre,
                         data: {
                           ...(pre.data ?? dataDefault),
-                          khhdon_first: (data.length > 1
-                            ? data.charAt(1)
-                            : data
-                          ).toUpperCase(),
+                          khhdon_first:
+                            data.length <= 2
+                              ? data
+                                  .replace(pre.data?.khhdon_first ?? "", "")
+                                  .toUpperCase()
+                              : "",
                         },
                       }))
                     } else
@@ -228,7 +226,7 @@ const ViewBill = (props: {
                       ...pre,
                       data: {
                         ...(pre.data ?? dataDefault),
-                        khhdon_last: data,
+                        khhdon_last: data.toUpperCase(),
                       },
                     }))
                   }}
@@ -278,7 +276,7 @@ const ViewBill = (props: {
                   if (
                     dataSetSubmit.data &&
                     dataSetSubmit.data.nbmst &&
-                    dataSetSubmit.data.khhdon_first &&
+                    // dataSetSubmit.data.khhdon_first &&
                     dataSetSubmit.data.khhdon_last &&
                     dataSetSubmit.data.shdon &&
                     dataSetSubmit.data.tgtttbso

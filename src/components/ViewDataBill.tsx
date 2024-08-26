@@ -24,6 +24,10 @@ function covertCode(code: number, status?: number) {
       return "Hóa đơn đã bị hủy"
   }
 }
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr)
+  return date.toLocaleDateString("vi-VN")
+}
 const ViewBill = (props: { params: IBill }) => {
   const getDataBySubmission = useGetDataBill(props.params)
   if (getDataBySubmission.isLoading) return <div>Đang lấy dữ liệu</div>
@@ -35,12 +39,74 @@ const ViewBill = (props: { params: IBill }) => {
         <div className="container">
           <div className="title">Thông tin kiểm tra hóa đơn</div>
           <div className="content">
-            <ul>
-              {covertCode(
-                getDataBySubmission.data.hddt?.code,
-                getDataBySubmission.data.hddt?.status
-              )}
-            </ul>
+            {getDataBySubmission.data.hddt && (
+              <ul>
+                <li>
+                  {covertCode(
+                    getDataBySubmission.data.hddt?.code,
+                    getDataBySubmission.data.hddt?.status
+                  )}
+                </li>
+                <br />
+                {getDataBySubmission.data.hddt?.statusDesc && (
+                  <li>
+                    <label>
+                      <b>Thông tin</b>
+                      <span>{getDataBySubmission.data.hddt?.statusDesc}</span>
+                    </label>
+                  </li>
+                )}
+                {getDataBySubmission.data.hddt.desc && (
+                  <li>
+                    <label>
+                      <b>Mô tả</b>
+                      <span>{getDataBySubmission.data.hddt.desc ?? ""}</span>
+                    </label>
+                  </li>
+                )}
+                {getDataBySubmission.data.hddt.reason && (
+                  <li>
+                    <label>
+                      <b>Lý do</b>
+                      <span>{getDataBySubmission.data.hddt.reason}</span>
+                    </label>
+                  </li>
+                )}
+                {getDataBySubmission.data.hddt.updatedDate && (
+                  <li>
+                    <label>
+                      <b>Ngày cập nhật</b>
+                      <span>
+                        {formatDate(getDataBySubmission.data.hddt.updatedDate)}
+                      </span>
+                    </label>
+                  </li>
+                )}
+                {getDataBySubmission.data.hddt.refInvoice[0]?.EInvoiceCode && (
+                  <li>
+                    <label>
+                      <b>Ký hiệu hóa đơn</b>
+                      <span>
+                        {
+                          getDataBySubmission.data.hddt.refInvoice[0]
+                            .EInvoiceCode
+                        }
+                      </span>
+                    </label>
+                  </li>
+                )}
+                {getDataBySubmission.data.hddt.refInvoice[0]?.EInvoiceNo && (
+                  <li>
+                    <label>
+                      <b>Số hóa đơn</b>
+                      <span>
+                        {getDataBySubmission.data.hddt.refInvoice[0].EInvoiceNo}
+                      </span>
+                    </label>
+                  </li>
+                )}
+              </ul>
+            )}
           </div>
           <div className="content">
             <ul>
