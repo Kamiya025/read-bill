@@ -70,7 +70,8 @@ function GetDataWrapper(props: { submissionID: string }) {
         setDataSet({
           data: {
             nbmst: output["supplier_data.tax_code"].value,
-            khhdon: output["invoice_data.serial_no"].value?.substring(1),
+            khhdon_first: output["invoice_data.serial_no"].value?.charAt(0),
+            khhdon_last: output["invoice_data.serial_no"].value?.substring(1),
             shdon: output["invoice_data.invoice_no"].value,
             tgtttbso: String(
               Math.floor(Number(output["invoice_data.sub_total"].value))
@@ -139,14 +140,16 @@ const ViewBill = (props: {
   }>({
     data: {
       nbmst: dataSet?.nbmst ?? "",
-      khhdon: dataSet?.khhdon ?? "",
+      khhdon_first: dataSet?.khhdon_first ?? "",
+      khhdon_last: dataSet?.khhdon_last ?? "",
       shdon: dataSet?.shdon ?? "",
       tgtttbso: dataSet?.tgtttbso ?? "",
     },
   })
   const dataDefault: IBill = {
     nbmst: "",
-    khhdon: "",
+    khhdon_last: "",
+    khhdon_first: "",
     shdon: "",
     tgtttbso: "",
   }
@@ -155,7 +158,8 @@ const ViewBill = (props: {
       ...pre,
       data: {
         nbmst: dataSet?.nbmst ?? "",
-        khhdon: dataSet?.khhdon ?? "",
+        khhdon_first: dataSet?.khhdon_first ?? "",
+        khhdon_last: dataSet?.khhdon_last ?? "",
         shdon: dataSet?.shdon ?? "",
         tgtttbso: dataSet?.tgtttbso ?? "",
       },
@@ -188,17 +192,17 @@ const ViewBill = (props: {
               <li>
                 <Input
                   label="Loại Hóa đơn"
-                  value={dataSetSubmit.data?.khhdon?.charAt(0)}
-                  defaultValue={dataSet?.khhdon?.charAt(0)}
+                  value={dataSetSubmit.data?.khhdon_first}
+                  defaultValue={dataSet?.khhdon_first}
                   onChange={(data) => {
                     if (data.trim()) {
                       setDataSetSubmit((pre) => ({
                         ...pre,
                         data: {
                           ...(pre.data ?? dataDefault),
-                          khhdon: (
-                            (data.length > 1 ? data.charAt(1) : data) +
-                            pre.data?.khhdon.substring(1)
+                          khhdon_first: (data.length > 1
+                            ? data.charAt(1)
+                            : data
                           ).toUpperCase(),
                         },
                       }))
@@ -217,14 +221,14 @@ const ViewBill = (props: {
               <li>
                 <Input
                   label="Ký hiệu Hóa đơn"
-                  value={dataSetSubmit.data?.khhdon?.substring(1)}
-                  defaultValue={dataSet?.khhdon?.substring(1)}
+                  value={dataSetSubmit.data?.khhdon_last}
+                  defaultValue={dataSet?.khhdon_last}
                   onChange={(data) => {
                     setDataSetSubmit((pre) => ({
                       ...pre,
                       data: {
                         ...(pre.data ?? dataDefault),
-                        khhdon: pre.data?.khhdon.charAt(0) + data,
+                        khhdon_last: data,
                       },
                     }))
                   }}
@@ -241,7 +245,7 @@ const ViewBill = (props: {
                       ...pre,
                       data: {
                         ...(pre.data ?? dataDefault),
-                        shdon: pre.data?.khhdon?.charAt(0) + data,
+                        shdon: data,
                       },
                     }))
                   }}
@@ -274,7 +278,8 @@ const ViewBill = (props: {
                   if (
                     dataSetSubmit.data &&
                     dataSetSubmit.data.nbmst &&
-                    dataSetSubmit.data.khhdon &&
+                    dataSetSubmit.data.khhdon_first &&
+                    dataSetSubmit.data.khhdon_last &&
                     dataSetSubmit.data.shdon &&
                     dataSetSubmit.data.tgtttbso
                   ) {

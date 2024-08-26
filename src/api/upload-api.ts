@@ -25,7 +25,14 @@ const uploadApi = {
   getDataBill(params: IBill): Promise<IRootBillObject> {
     const url = `https://api.matchs.vnest.vn/api`
 
-    return axiosClient.get(url, { params })
+    return axiosClient.get(url, {
+      params: {
+        nbmst: params.nbmst,
+        khhdon: params.khhdon_last,
+        shdon: params.shdon,
+        tgtttbso: params.tgtttbso,
+      },
+    })
   },
 }
 export default uploadApi

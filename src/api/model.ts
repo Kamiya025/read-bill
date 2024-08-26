@@ -70,7 +70,8 @@ interface Unclassifiedfile {
 }
 export interface IBill {
   nbmst: string
-  khhdon: string
+  khhdon_first: string
+  khhdon_last: string
   shdon: string
   tgtttbso: string
 }
