@@ -109,6 +109,17 @@
   text-transform: uppercase;
   cursor: pointer;
 }
+.btn {
+  padding: 10px 20px;
+  text-align: center;
+  background-color: #0a68f4;
+  color: azure;
+  border: 0;
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
 .submit:hover {
   background-color: #03c256;
 }

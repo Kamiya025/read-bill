@@ -1,10 +1,21 @@
+import { forwardRef, useImperativeHandle } from "react"
 import { IBill } from "../api/model"
 import { useGetDataBill } from "../api/query"
-
-function GetDataBillWrapper(props: { params?: IBill }) {
-  if (props.params) return <ViewBill params={props.params} />
-  return <></>
+interface GetDataBillWrapperProps {
+  params?: IBill
 }
+
+export interface ChildActionProps {
+  refetch: () => void
+}
+
+const GetDataBillWrapper = forwardRef<
+  ChildActionProps,
+  GetDataBillWrapperProps
+>(({ params }, ref) => {
+  if (params) return <ViewBill params={params} ref={ref} />
+  return <></>
+})
 function covertCode(code: number, status?: number) {
   if (code === 0) return "Hóa đơn không tồn tại"
   switch (status) {
@@ -28,102 +39,114 @@ function formatDate(dateStr: string) {
   const date = new Date(dateStr)
   return date.toLocaleDateString("vi-VN")
 }
-const ViewBill = (props: { params: IBill }) => {
-  const getDataBySubmission = useGetDataBill(props.params)
-  if (getDataBySubmission.isLoading) return <div>Đang lấy dữ liệu</div>
-  if (getDataBySubmission.isError)
-    return <div>Lấy dữ liệu không thành công, vui lòng thử lại sau</div>
-  if (getDataBySubmission.isSuccess) {
-    return (
-      <div>
-        <div className="container">
-          <div className="title">Thông tin kiểm tra hóa đơn</div>
-          <div className="content">
-            {getDataBySubmission.data.hddt && (
-              <ul>
-                <li>
-                  {covertCode(
-                    getDataBySubmission.data.hddt?.code,
-                    getDataBySubmission.data.hddt?.status
+const ViewBill = forwardRef<ChildActionProps, { params: IBill }>(
+  (props, ref) => {
+    const getDataByParams = useGetDataBill(props.params)
+    useImperativeHandle(ref, () => ({
+      refetch: () => {
+        if (getDataByParams.isError) getDataByParams.refetch()
+      },
+    }))
+    if (getDataByParams.isLoading) return <div>Đang lấy dữ liệu</div>
+    if (getDataByParams.isError)
+      return (
+        <div>
+          <div>Lấy dữ liệu không thành công, vui lòng thử lại sau</div>
+          <br />
+          <button className="btn" onClick={() => getDataByParams.refetch()}>
+            Kiểm tra lại
+          </button>
+        </div>
+      )
+    if (getDataByParams.isSuccess) {
+      return (
+        <div>
+          <div className="container">
+            <div className="title">Thông tin kiểm tra hóa đơn</div>
+            <div className="content">
+              {getDataByParams.data.hddt && (
+                <ul>
+                  <li>
+                    {covertCode(
+                      getDataByParams.data.hddt?.code,
+                      getDataByParams.data.hddt?.status
+                    )}
+                  </li>
+                  <br />
+                  {getDataByParams.data.hddt?.statusDesc && (
+                    <li>
+                      <label>
+                        <b>Thông tin</b>
+                        <span>{getDataByParams.data.hddt?.statusDesc}</span>
+                      </label>
+                    </li>
                   )}
-                </li>
-                <br />
-                {getDataBySubmission.data.hddt?.statusDesc && (
-                  <li>
+                  {getDataByParams.data.hddt.desc && (
+                    <li>
+                      <label>
+                        <b>Mô tả</b>
+                        <span>{getDataByParams.data.hddt.desc ?? ""}</span>
+                      </label>
+                    </li>
+                  )}
+                  {getDataByParams.data.hddt.reason && (
+                    <li>
+                      <label>
+                        <b>Lý do</b>
+                        <span>{getDataByParams.data.hddt.reason}</span>
+                      </label>
+                    </li>
+                  )}
+                  {getDataByParams.data.hddt.updatedDate && (
+                    <li>
+                      <label>
+                        <b>Ngày cập nhật</b>
+                        <span>
+                          {formatDate(getDataByParams.data.hddt.updatedDate)}
+                        </span>
+                      </label>
+                    </li>
+                  )}
+                  {getDataByParams.data.hddt.refInvoice[0]?.EInvoiceCode && (
+                    <li>
+                      <label>
+                        <b>Ký hiệu hóa đơn</b>
+                        <span>
+                          {getDataByParams.data.hddt.refInvoice[0].EInvoiceCode}
+                        </span>
+                      </label>
+                    </li>
+                  )}
+                  {getDataByParams.data.hddt.refInvoice[0]?.EInvoiceNo && (
+                    <li>
+                      <label>
+                        <b>Số hóa đơn</b>
+                        <span>
+                          {getDataByParams.data.hddt.refInvoice[0].EInvoiceNo}
+                        </span>
+                      </label>
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+            <div className="content">
+              <ul>
+                {getDataByParams.data.nnt?.map((item, index) => (
+                  <li key={index}>
                     <label>
-                      <b>Thông tin</b>
-                      <span>{getDataBySubmission.data.hddt?.statusDesc}</span>
+                      <b>{item.key}</b>
+                      <span>{item.value}</span>
                     </label>
                   </li>
-                )}
-                {getDataBySubmission.data.hddt.desc && (
-                  <li>
-                    <label>
-                      <b>Mô tả</b>
-                      <span>{getDataBySubmission.data.hddt.desc ?? ""}</span>
-                    </label>
-                  </li>
-                )}
-                {getDataBySubmission.data.hddt.reason && (
-                  <li>
-                    <label>
-                      <b>Lý do</b>
-                      <span>{getDataBySubmission.data.hddt.reason}</span>
-                    </label>
-                  </li>
-                )}
-                {getDataBySubmission.data.hddt.updatedDate && (
-                  <li>
-                    <label>
-                      <b>Ngày cập nhật</b>
-                      <span>
-                        {formatDate(getDataBySubmission.data.hddt.updatedDate)}
-                      </span>
-                    </label>
-                  </li>
-                )}
-                {getDataBySubmission.data.hddt.refInvoice[0]?.EInvoiceCode && (
-                  <li>
-                    <label>
-                      <b>Ký hiệu hóa đơn</b>
-                      <span>
-                        {
-                          getDataBySubmission.data.hddt.refInvoice[0]
-                            .EInvoiceCode
-                        }
-                      </span>
-                    </label>
-                  </li>
-                )}
-                {getDataBySubmission.data.hddt.refInvoice[0]?.EInvoiceNo && (
-                  <li>
-                    <label>
-                      <b>Số hóa đơn</b>
-                      <span>
-                        {getDataBySubmission.data.hddt.refInvoice[0].EInvoiceNo}
-                      </span>
-                    </label>
-                  </li>
-                )}
+                ))}
               </ul>
-            )}
-          </div>
-          <div className="content">
-            <ul>
-              {getDataBySubmission.data.nnt?.map((item, index) => (
-                <li key={index}>
-                  <label>
-                    <b>{item.key}</b>
-                    <span>{item.value}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
+            </div>
           </div>
         </div>
-      </div>
-    )
+      )
+    }
+    return <></>
   }
-  return <></>
-}
+)
 export default GetDataBillWrapper

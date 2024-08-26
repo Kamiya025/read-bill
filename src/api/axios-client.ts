@@ -9,7 +9,7 @@ const axiosClient = axios.create({
     "Content-Type": "application/json",
     Authorization: `Basic ${encodedApiKey}`,
   },
-  timeout: 60000,
+  timeout: 10000,
 })
 
 // Add a request interceptor
