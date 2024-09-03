@@ -78,6 +78,7 @@
   color: var(--text-color-light);
   overflow-y: auto;
   overflow-x: hidden;
+  cursor: pointer;
 }
 
 .items-img > .item-img {
@@ -293,8 +294,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  /* overflow: hidden; */
-  /* border-radius: 20px; */
+  table-layout: auto;
   position: relative;
 }
 

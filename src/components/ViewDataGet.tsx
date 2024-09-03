@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react"
-import { IBillForCheck, IBillConfidenceScore, IFile } from "../api/model"
-import { useCheckBillMutation } from "../hook"
+import {
+  IBillConfidenceScore,
+  IBillForCheck,
+  IFile,
+  IRootBillObject,
+} from "../api/model"
 function covertCode(code: number | undefined, status?: number) {
   if (code === 0) return "Hóa đơn không tồn tại"
   switch (status) {
@@ -23,7 +27,7 @@ function covertCode(code: number | undefined, status?: number) {
 export const ViewBillGet = (props: {
   file?: IFile
   dataSet?: IBillForCheck
-  bonus?: { code?: number; statusBill?: number; time?: string }
+  bonus?: IRootBillObject
   dataSetConfidenceScore: IBillConfidenceScore
   submit: (data: IBillForCheck) => void
   isLoadingSubmit: boolean
@@ -168,8 +172,10 @@ export const ViewBillGet = (props: {
             />
           </td>
           <td>{dataSetSubmit.data?.nbten ?? ""}</td>
-          <td>{props.bonus?.statusBill}</td>
-          <td>{covertCode(props.bonus?.code, props.bonus?.statusBill)}</td>
+          <td>{props.bonus?.hddt.status}</td>
+          <td>
+            {covertCode(props.bonus?.hddt.code, props.bonus?.hddt.status)}
+          </td>
           <td>{props.dataSet?.nmten ?? ""}</td>
           <td>{props.bonus?.time}</td>
           <td className="sticky-x">

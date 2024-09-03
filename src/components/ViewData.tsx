@@ -1,6 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
-import { IBillForCheck, IBillConfidenceScore } from "../api/model"
+import {
+  IBillForCheck,
+  IBillConfidenceScore,
+  IRootBillObject,
+} from "../api/model"
 import { allKeys, useGetData } from "../api/query"
 import GetDataBillWrapper, { ChildActionProps } from "./ViewDataBill"
 import ViewBillGet from "./ViewDataGet"
@@ -41,7 +45,7 @@ function GetDataWrapper(props: { submissionID: string }) {
     data?: IBillForCheck
     submit?: IBillForCheck
     score: IBillConfidenceScore
-    bonus?: { code?: number; statusBill?: number; time?: string }
+    bonus?: IRootBillObject
   }>({
     score: {
       nbmst: 1,
@@ -57,11 +61,7 @@ function GetDataWrapper(props: { submissionID: string }) {
   const mutation = useCheckBillMutation((data) => {
     setDataSet((pre) => ({
       ...pre,
-      bonus: {
-        code: data.hddt?.code,
-        statusBill: data.hddt.status,
-        time: data.time,
-      },
+      bonus: data,
     }))
   })
   useEffect(() => {

@@ -53,7 +53,13 @@ function App() {
           <div className="items-img">
             {filesSelected &&
               filesSelected.map((file, index) => (
-                <label key={file.name + index} className="item-img">
+                <label
+                  key={file.name + index}
+                  className="item-img"
+                  onClick={() => {
+                    window.open(URL.createObjectURL(file), "_blank")
+                  }}
+                >
                   <img
                     src={URL.createObjectURL(file)}
                     alt="Uploaded file preview"
