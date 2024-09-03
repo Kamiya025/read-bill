@@ -1,6 +1,6 @@
 import { useState } from "react"
 import "./style/App.css"
-import { useUploadMutation } from "./hook"
+import { handleExport, useUploadMutation } from "./hook"
 import GetDataWrapper from "./components/ViewData"
 
 function App() {
@@ -73,7 +73,14 @@ function App() {
         <div className="right">
           <div className="export">
             <div>Danh sách hóa đơn VAT</div>
-            <button className="submit">Xuất file</button>
+            <button
+              className="submit"
+              onClick={() => {
+                handleExport()
+              }}
+            >
+              Xuất file
+            </button>
           </div>
           <div className="container-table">
             <table>
