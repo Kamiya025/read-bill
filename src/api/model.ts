@@ -2,7 +2,7 @@ export interface IUploadResponse {
   success_submission_ids: string[]
 }
 export interface IUploadBody {
-  files: File
+  files: IFile
 }
 export interface RootObjectDataSubmission {
   id: string
@@ -35,11 +35,11 @@ export interface RootObjectDataSubmission {
   unclassified_pages_count: number
   unclassified_files: Unclassifiedfile[]
   documents: Document[]
-  files: File[]
+  files: IFile[]
   pages_count: number
 }
 
-interface File {
+export interface IFile {
   id: string
   created_at: string
   updated_at: string
@@ -68,12 +68,14 @@ interface Unclassifiedfile {
   page: string
   page_index: number
 }
-export interface IBill {
+export interface IBillForCheck {
   nbmst: string
   khhdon_first: string
   khhdon_last: string
   shdon: string
   tgtttbso: string
+  nbten?: string
+  nmten?: string
 }
 export interface IBillMessageError {
   nbmst?: string
@@ -93,6 +95,7 @@ export interface IRootBillObject {
   hddt: Hddt
   nnt: Nnt[]
   description: string
+  time: string
 }
 
 interface Nnt {

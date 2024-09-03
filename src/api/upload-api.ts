@@ -1,7 +1,7 @@
 import axios from "axios"
 import axiosClient from "./axios-client"
 import {
-  IBill,
+  IBillForCheck,
   IRootBillObject,
   IUploadBody,
   IUploadResponse,
@@ -22,7 +22,7 @@ const uploadApi = {
 
     return axiosClient.get(url)
   },
-  getDataBill(params: IBill): Promise<IRootBillObject> {
+  getDataBill(params: IBillForCheck): Promise<IRootBillObject> {
     const url = `https://api.matchs.vnest.vn/api`
 
     return axiosClient.get(url, {

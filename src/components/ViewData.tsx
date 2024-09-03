@@ -1,9 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
-import { IBill, IBillConfidenceScore } from "../api/model"
+import { IBillForCheck, IBillConfidenceScore } from "../api/model"
 import { allKeys, useGetData } from "../api/query"
 import GetDataBillWrapper, { ChildActionProps } from "./ViewDataBill"
 import ViewBillGet from "./ViewDataGet"
+import { useCheckBillMutation } from "../hook"
 
 function traverseDataSets(
   dataSets: any,
@@ -37,9 +38,10 @@ function traverseDataSets(
 
 function GetDataWrapper(props: { submissionID: string }) {
   const [dataSet, setDataSet] = useState<{
-    data?: IBill
-    submit?: IBill
+    data?: IBillForCheck
+    submit?: IBillForCheck
     score: IBillConfidenceScore
+    bonus?: { code?: number; statusBill?: number; time?: string }
   }>({
     score: {
       nbmst: 1,
@@ -48,11 +50,20 @@ function GetDataWrapper(props: { submissionID: string }) {
       tgtttbso: 1,
     },
   })
-  const refBillFind = useRef<ChildActionProps>(null)
+  // const refBillFind = useRef<ChildActionProps>(null)
   const getDataBySubmission = useGetData(props.submissionID)
-  const debounce = 3000
+  const debounce = 1000
   const queryClient = useQueryClient()
-
+  const mutation = useCheckBillMutation((data) => {
+    setDataSet((pre) => ({
+      ...pre,
+      bonus: {
+        code: data.hddt?.code,
+        statusBill: data.hddt.status,
+        time: data.time,
+      },
+    }))
+  })
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined
 
@@ -72,28 +83,33 @@ function GetDataWrapper(props: { submissionID: string }) {
           traverseDataSets(dataSets, undefined, output)
 
           let data = {
-            nbmst: output["supplier_data.tax_code"].value ?? "",
+            nbmst: output["supplier_data.tax_code"]?.value ?? "",
             khhdon_first:
-              output["invoice_data.serial_no"].value?.charAt(0) ?? "",
+              output["invoice_data.serial_no"]?.value?.charAt(0) ?? "",
             khhdon_last:
-              output["invoice_data.serial_no"].value?.substring(1) ?? "",
-            shdon: output["invoice_data.invoice_no"].value ?? "",
-            tgtttbso: output["invoice_data.total_amount"].value
+              output["invoice_data.serial_no"]?.value?.substring(1) ?? "",
+            shdon: output["invoice_data.invoice_no"]?.value ?? "",
+            tgtttbso: output["invoice_data.total_amount"]?.value
               ? String(
-                  Math.floor(Number(output["invoice_data.total_amount"].value))
+                  Math.floor(Number(output["invoice_data.total_amount"]?.value))
                 )
               : String(
-                  Math.floor(Number(output["invoice_data.sub_total"].value))
+                  Math.floor(Number(output["invoice_data.sub_total"]?.value))
                 ),
+            nbten: output["supplier_data.supplier"]?.value ?? "",
+            nmten:
+              output["purchaser_data.purchaser_name"]?.value ??
+              output["purchaser_data.buyer_name"]?.value ??
+              "",
           }
 
           let score = {
-            nbmst: output["supplier_data.tax_code"].confidence_score ?? 0,
-            khhdon: output["invoice_data.serial_no"].confidence_score ?? 0,
-            shdon: output["invoice_data.invoice_no"].confidence_score ?? 0,
-            tgtttbso: output["invoice_data.total_amount"].value
-              ? output["invoice_data.total_amount"].confidence_score ?? 0
-              : output["invoice_data.sub_total"].confidence_score ?? 0,
+            nbmst: output["supplier_data.tax_code"]?.confidence_score ?? 0,
+            khhdon: output["invoice_data.serial_no"]?.confidence_score ?? 0,
+            shdon: output["invoice_data.invoice_no"]?.confidence_score ?? 0,
+            tgtttbso: output["invoice_data.total_amount"]?.value
+              ? output["invoice_data.total_amount"]?.confidence_score ?? 0
+              : output["invoice_data.sub_total"]?.confidence_score ?? 0,
           }
 
           let submit = undefined
@@ -104,6 +120,7 @@ function GetDataWrapper(props: { submissionID: string }) {
             score.tgtttbso > 0.9
           ) {
             submit = data
+            mutation.mutate(data)
           }
 
           setDataSet({
@@ -130,32 +147,40 @@ function GetDataWrapper(props: { submissionID: string }) {
 
   if (
     getDataBySubmission.isLoading ||
+    // mutation.isPending ||
     !getDataBySubmission.data?.documents[0]?.data_set
   )
     return (
-      <>
-        <div>Đang lấy dữ liệu...</div>
-        {!getDataBySubmission.data?.documents[0]?.id && (
-          <div>Đang quét dữ liệu, vui lòng đợi hệ thống xử lý...</div>
-        )}
-      </>
+      <tr>
+        <td colSpan={11}>
+          <div>Đang lấy dữ liệu...</div>
+        </td>
+      </tr>
     )
   if (getDataBySubmission.isError)
-    return <div>Lấy dữ liệu không thành công, vui lòng thử lại sau</div>
+    return (
+      <tr>
+        <td colSpan={11}>Lấy dữ liệu không thành công, vui lòng thử lại sau</td>
+      </tr>
+    )
   if (getDataBySubmission.isSuccess) {
     return (
-      <div className="body">
+      <tr>
         <ViewBillGet
+          file={getDataBySubmission.data.files[0]}
           dataSet={dataSet.data}
+          bonus={dataSet.bonus}
+          isLoadingSubmit={mutation.isPending}
           submit={(submit) => {
             setDataSet((pre) => ({ ...pre, submit }))
-            refBillFind.current?.refetch()
+
+            mutation.mutate(submit)
           }}
           dataSetConfidenceScore={dataSet.score}
         />
 
-        <GetDataBillWrapper ref={refBillFind} params={dataSet.submit} />
-      </div>
+        {/* <GetDataBillWrapper ref={refBillFind} params={dataSet.submit} /> */}
+      </tr>
     )
   }
   return <></>

@@ -1,8 +1,8 @@
 import { forwardRef, useImperativeHandle } from "react"
-import { IBill } from "../api/model"
+import { IBillForCheck } from "../api/model"
 import { useGetDataBill } from "../api/query"
 interface GetDataBillWrapperProps {
-  params?: IBill
+  params?: IBillForCheck
 }
 
 export interface ChildActionProps {
@@ -39,7 +39,7 @@ function formatDate(dateStr: string) {
   const date = new Date(dateStr)
   return date.toLocaleDateString("vi-VN")
 }
-const ViewBill = forwardRef<ChildActionProps, { params: IBill }>(
+const ViewBill = forwardRef<ChildActionProps, { params: IBillForCheck }>(
   (props, ref) => {
     const getDataByParams = useGetDataBill(props.params)
     useImperativeHandle(ref, () => ({
@@ -60,77 +60,18 @@ const ViewBill = forwardRef<ChildActionProps, { params: IBill }>(
       )
     if (getDataByParams.isSuccess) {
       return (
-        <div>
-          <div className="container">
-            <div className="title">Thông tin kiểm tra hóa đơn</div>
-            <div className="content">
-              {getDataByParams.data.hddt && (
-                <ul>
-                  <li>
-                    {covertCode(
-                      getDataByParams.data.hddt?.code,
-                      getDataByParams.data.hddt?.status
-                    )}
-                  </li>
-                  <br />
-                  {getDataByParams.data.hddt?.statusDesc && (
-                    <li>
-                      <label>
-                        <b>Thông tin</b>
-                        <span>{getDataByParams.data.hddt?.statusDesc}</span>
-                      </label>
-                    </li>
-                  )}
-                  {getDataByParams.data.hddt.desc && (
-                    <li>
-                      <label>
-                        <b>Mô tả</b>
-                        <span>{getDataByParams.data.hddt.desc ?? ""}</span>
-                      </label>
-                    </li>
-                  )}
-                  {getDataByParams.data.hddt.reason && (
-                    <li>
-                      <label>
-                        <b>Lý do</b>
-                        <span>{getDataByParams.data.hddt.reason}</span>
-                      </label>
-                    </li>
-                  )}
-                  {getDataByParams.data.hddt.updatedDate && (
-                    <li>
-                      <label>
-                        <b>Ngày cập nhật</b>
-                        <span>
-                          {formatDate(getDataByParams.data.hddt.updatedDate)}
-                        </span>
-                      </label>
-                    </li>
-                  )}
-                  {getDataByParams.data.hddt.refInvoice[0]?.EInvoiceCode && (
-                    <li>
-                      <label>
-                        <b>Ký hiệu hóa đơn</b>
-                        <span>
-                          {getDataByParams.data.hddt.refInvoice[0].EInvoiceCode}
-                        </span>
-                      </label>
-                    </li>
-                  )}
-                  {getDataByParams.data.hddt.refInvoice[0]?.EInvoiceNo && (
-                    <li>
-                      <label>
-                        <b>Số hóa đơn</b>
-                        <span>
-                          {getDataByParams.data.hddt.refInvoice[0].EInvoiceNo}
-                        </span>
-                      </label>
-                    </li>
-                  )}
-                </ul>
+        <>
+          <>
+            <td>{getDataByParams.data.hddt?.status}</td>
+            <td>
+              {covertCode(
+                getDataByParams.data.hddt?.code,
+                getDataByParams.data.hddt?.status
               )}
-            </div>
-            <div className="content">
+            </td>
+          </>
+
+          {/* <div className="content">
               <ul>
                 {getDataByParams.data.nnt?.map((item, index) => (
                   <li key={index}>
@@ -138,12 +79,10 @@ const ViewBill = forwardRef<ChildActionProps, { params: IBill }>(
                       <b>{item.key}</b>
                       <span>{item.value}</span>
                     </label>
-                  </li>
+                  </td>
                 ))}
-              </ul>
-            </div>
-          </div>
-        </div>
+              </ul> */}
+        </>
       )
     }
     return <></>

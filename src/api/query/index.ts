@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 import uploadApi from "../upload-api"
-import { IBill } from "../model"
+import { IBillForCheck } from "../model"
 export const allKeys = {
   all: ["allKeys"] as const,
   getDataBySubmissionID: (submissionID: string) =>
     [...allKeys.all, submissionID, "getDataBySubmissionID"] as const,
-  getDataBill: (params: IBill) =>
+  getDataBill: (params: IBillForCheck) =>
     [...allKeys.all, params, "getDataBill"] as const,
 }
 export function useGetData(submissionID: string) {
@@ -14,7 +14,7 @@ export function useGetData(submissionID: string) {
     queryFn: () => uploadApi.getData(submissionID),
   })
 }
-export function useGetDataBill(params: IBill) {
+export function useGetDataBill(params: IBillForCheck) {
   return useQuery({
     queryKey: allKeys.getDataBill(params),
     queryFn: () => uploadApi.getDataBill(params),

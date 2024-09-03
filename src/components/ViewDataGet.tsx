@@ -1,17 +1,36 @@
-import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
-import { IBill, IBillConfidenceScore } from "../api/model"
-import { allKeys, useGetData } from "../api/query"
-import GetDataBillWrapper from "./ViewDataBill"
-
+import { IBillForCheck, IBillConfidenceScore, IFile } from "../api/model"
+import { useCheckBillMutation } from "../hook"
+function covertCode(code: number | undefined, status?: number) {
+  if (code === 0) return "Hóa đơn không tồn tại"
+  switch (status) {
+    case 0:
+      return "Hóa đơn không tồn tại"
+    case 1:
+      return "Hóa đơn mới"
+    case 2:
+      return "Hóa đơn thay thế"
+    case 3:
+      return "Hóa đơn điều chỉnh"
+    case 4:
+      return "Hóa đơn đã bị thay thế"
+    case 5:
+      return "Hóa đơn đã bị điều chỉnh"
+    case 6:
+      return "Hóa đơn đã bị hủy"
+  }
+}
 export const ViewBillGet = (props: {
-  dataSet?: IBill
+  file?: IFile
+  dataSet?: IBillForCheck
+  bonus?: { code?: number; statusBill?: number; time?: string }
   dataSetConfidenceScore: IBillConfidenceScore
-  submit: (data: IBill) => void
+  submit: (data: IBillForCheck) => void
+  isLoadingSubmit: boolean
 }) => {
   const { dataSet, dataSetConfidenceScore } = props
   const [dataSetSubmit, setDataSetSubmit] = useState<{
-    data?: IBill
+    data?: IBillForCheck
   }>({
     data: {
       nbmst: dataSet?.nbmst ?? "",
@@ -21,7 +40,7 @@ export const ViewBillGet = (props: {
       tgtttbso: dataSet?.tgtttbso ?? "",
     },
   })
-  const dataDefault: IBill = {
+  const dataDefault: IBillForCheck = {
     nbmst: "",
     khhdon_last: "",
     khhdon_first: "",
@@ -37,119 +56,128 @@ export const ViewBillGet = (props: {
         khhdon_last: dataSet?.khhdon_last ?? "",
         shdon: dataSet?.shdon ?? "",
         tgtttbso: dataSet?.tgtttbso ?? "",
+        nbten: dataSet?.nbten,
+        nmten: dataSet?.nmten,
       },
     }))
   }, [props.dataSet])
   if (dataSet) {
     return (
       <>
-        <div className="container border">
+        {/* <div className="container border">
           <div className="title">Tra cứu hóa đơn</div>
-          <div className="content">
-            <ul>
-              <li>
-                <Input
-                  label="Mã số thuế"
-                  value={dataSetSubmit.data?.nbmst}
-                  defaultValue={dataSet?.nbmst}
-                  onChange={(data) => {
-                    setDataSetSubmit((pre) => ({
-                      ...pre,
-                      data: {
-                        ...(pre.data ?? dataDefault),
-                        nbmst: data,
-                      },
-                    }))
-                  }}
-                  score={dataSetConfidenceScore.nbmst}
-                />
-              </li>
-              <li>
-                <Input
-                  label="Loại Hóa đơn"
-                  value={dataSetSubmit.data?.khhdon_first}
-                  defaultValue={dataSet?.khhdon_first}
-                  onChange={(data) => {
-                    if (data.trim()) {
-                      setDataSetSubmit((pre) => ({
-                        ...pre,
-                        data: {
-                          ...(pre.data ?? dataDefault),
-                          khhdon_first:
-                            data.length <= 2
-                              ? data
-                                  .replace(pre.data?.khhdon_first ?? "", "")
-                                  .toUpperCase()
-                              : "",
-                        },
-                      }))
-                    } else
-                      setDataSetSubmit((pre) => ({
-                        ...pre,
-                        data: {
-                          ...(pre.data ?? dataDefault),
-                          khhdon: "",
-                        },
-                      }))
-                  }}
-                  score={dataSetConfidenceScore.khhdon}
-                />
-              </li>
-              <li>
-                <Input
-                  label="Ký hiệu Hóa đơn"
-                  value={dataSetSubmit.data?.khhdon_last}
-                  defaultValue={dataSet?.khhdon_last}
-                  onChange={(data) => {
-                    setDataSetSubmit((pre) => ({
-                      ...pre,
-                      data: {
-                        ...(pre.data ?? dataDefault),
-                        khhdon_last: data.toUpperCase(),
-                      },
-                    }))
-                  }}
-                  score={dataSetConfidenceScore.khhdon}
-                />
-              </li>
-              <li>
-                <Input
-                  label="Số hóa đơn"
-                  value={dataSetSubmit.data?.shdon}
-                  defaultValue={dataSet?.shdon}
-                  onChange={(data) => {
-                    setDataSetSubmit((pre) => ({
-                      ...pre,
-                      data: {
-                        ...(pre.data ?? dataDefault),
-                        shdon: data,
-                      },
-                    }))
-                  }}
-                  score={dataSetConfidenceScore.shdon}
-                />
-              </li>
-              <li>
-                <Input
-                  type="number"
-                  label="Tổng số tiền thanh toán"
-                  value={dataSetSubmit.data?.tgtttbso}
-                  defaultValue={dataSet?.tgtttbso}
-                  onChange={(data) => {
-                    setDataSetSubmit((pre) => ({
-                      ...pre,
-                      data: {
-                        ...(pre.data ?? dataDefault),
-                        tgtttbso: data,
-                      },
-                    }))
-                  }}
-                  score={dataSetConfidenceScore.tgtttbso}
-                />
-              </li>
+          <div className="content"> */}
+        <>
+          <td>{props.file?.name}</td>
+          <td>
+            {/* <Input
+              label="Loại Hóa đơn"
+              value={dataSetSubmit.data?.khhdon_first}
+              defaultValue={dataSet?.khhdon_first}
+              onChange={(data) => {
+                if (data.trim()) {
+                  setDataSetSubmit((pre) => ({
+                    ...pre,
+                    data: {
+                      ...(pre.data ?? dataDefault),
+                      khhdon_first:
+                        data.length <= 2
+                          ? data
+                              .replace(pre.data?.khhdon_first ?? "", "")
+                              .toUpperCase()
+                          : "",
+                    },
+                  }))
+                } else
+                  setDataSetSubmit((pre) => ({
+                    ...pre,
+                    data: {
+                      ...(pre.data ?? dataDefault),
+                      khhdon: "",
+                    },
+                  }))
+              }}
+              score={dataSetConfidenceScore.khhdon}
+            /> */}
+            <Input
+              label="Ký hiệu Hóa đơn"
+              value={dataSetSubmit.data?.khhdon_last}
+              defaultValue={dataSet?.khhdon_last}
+              onChange={(data) => {
+                setDataSetSubmit((pre) => ({
+                  ...pre,
+                  data: {
+                    ...(pre.data ?? dataDefault),
+                    khhdon_last: data.toUpperCase(),
+                  },
+                }))
+              }}
+              score={dataSetConfidenceScore.khhdon}
+            />
+          </td>
+          <td>
+            <Input
+              label="Số hóa đơn"
+              value={dataSetSubmit.data?.shdon}
+              defaultValue={dataSet?.shdon}
+              onChange={(data) => {
+                setDataSetSubmit((pre) => ({
+                  ...pre,
+                  data: {
+                    ...(pre.data ?? dataDefault),
+                    shdon: data,
+                  },
+                }))
+              }}
+              score={dataSetConfidenceScore.shdon}
+            />
+          </td>
+          <td>
+            <Input
+              type="number"
+              label="Tổng số tiền thanh toán"
+              value={dataSetSubmit.data?.tgtttbso}
+              defaultValue={dataSet?.tgtttbso}
+              onChange={(data) => {
+                setDataSetSubmit((pre) => ({
+                  ...pre,
+                  data: {
+                    ...(pre.data ?? dataDefault),
+                    tgtttbso: data,
+                  },
+                }))
+              }}
+              score={dataSetConfidenceScore.tgtttbso}
+            />
+          </td>
+          <td>
+            <Input
+              label="Mã số thuế"
+              value={dataSetSubmit.data?.nbmst}
+              defaultValue={dataSet?.nbmst}
+              onChange={(data) => {
+                setDataSetSubmit((pre) => ({
+                  ...pre,
+                  data: {
+                    ...(pre.data ?? dataDefault),
+                    nbmst: data,
+                  },
+                }))
+              }}
+              score={dataSetConfidenceScore.nbmst}
+            />
+          </td>
+          <td>{dataSetSubmit.data?.nbten ?? ""}</td>
+          <td>{props.bonus?.statusBill}</td>
+          <td>{covertCode(props.bonus?.code, props.bonus?.statusBill)}</td>
+          <td>{props.dataSet?.nmten ?? ""}</td>
+          <td>{props.bonus?.time}</td>
+          <td className="sticky-x">
+            {!props.isLoadingSubmit && (
               <button
                 type="button"
-                className="submit"
+                className="submit sq"
+                disabled={props.isLoadingSubmit}
                 onClick={() => {
                   console.log(dataSetSubmit.data)
                   if (
@@ -164,11 +192,27 @@ export const ViewBillGet = (props: {
                   }
                 }}
               >
-                Tra cứu
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  width={10}
+                  height={10}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                  />
+                </svg>
               </button>
-            </ul>
-          </div>
-        </div>
+            )}
+          </td>
+        </>
+        {/* </div>
+        </div> */}
       </>
     )
   }
@@ -185,9 +229,9 @@ const Input = (props: {
 }) => {
   return (
     <label>
-      <b>{props.label}</b>
+      {/* <b>{props.label}</b> */}
       <div>
-        {props.score <= 0.95 || !props.defaultValue ? (
+        {props.score <= 0.9 || !props.defaultValue ? (
           <input
             type={props.type}
             value={props.value}
