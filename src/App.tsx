@@ -132,15 +132,17 @@ function App() {
                       submissionID={id}
                       onChange={(data) => {
                         const newData: string[] = [
-                          data.data?.khhdon_last ?? "",
-                          data.data?.shdon ?? "",
-                          data.data?.tgtttbso ?? "",
-                          data.data?.nbmst ?? "",
-                          data.data?.nbten ?? "",
-                          data.bonus?.hddt.status?.toString() ?? "",
-                          data.data?.nmten ?? "",
-                          "",
-                          data.bonus?.time ?? "",
+                          data.data?.khhdon_last ?? " ",
+                          data.data?.shdon ?? " ",
+                          data.data?.tgtttbso ?? " ",
+                          data.data?.nbmst ?? " ",
+                          data.data?.nbten ?? " ",
+                          data.bonus?.hddt.status?.toString() ?? " ",
+                          " ",
+                          data.data?.nmten ?? " ",
+                          " ",
+                          " ",
+                          data.bonus?.time ?? " ",
                         ]
                         updateExportData(id, newData)
                       }}

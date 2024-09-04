@@ -1,6 +1,6 @@
 :root {
   --primary-color: #25817e;
-  --secondary-color: #f3f5b9;
+  --secondary-color: #f5f3b9;
   --secondary-color-hover: #ffc62f;
   --accent-color: #0a68f4;
   --accent-color-light: #03c256;
@@ -60,6 +60,7 @@
   font-size: small;
   border-radius: 10px;
   height: auto;
+  background: var(--primary-color);
 }
 
 .App-logo {
