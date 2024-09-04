@@ -126,7 +126,7 @@ function App() {
                           data.data?.tgtttbso ?? "",
                           data.data?.nbmst ?? "",
                           data.data?.nbten ?? "",
-                          String(data.bonus?.hddt.status) ?? "",
+                          data.bonus?.hddt.status?.toString() ?? "",
                           data.data?.nmten ?? "",
                           "",
                           data.bonus?.time ?? "",
