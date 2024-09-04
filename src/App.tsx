@@ -67,18 +67,20 @@ function App() {
                 <div>Chọn/Kéo thả tệp vào đây</div>
               </div>
             </label>
-            <div className="clear">
-              <button
-                className="clear-btn"
-                onClick={() => {
-                  setSubmissionsID(undefined)
-                  setFilesSelected(undefined)
-                  setExportData([])
-                }}
-              >
-                Clear
-              </button>
-            </div>
+            {filesSelected && filesSelected.length > 0 && (
+              <div className="clear">
+                <button
+                  className="clear-btn"
+                  onClick={() => {
+                    setSubmissionsID(undefined)
+                    setFilesSelected(undefined)
+                    setExportData([])
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
           </div>
           <div className="items-img">
             {filesSelected &&
