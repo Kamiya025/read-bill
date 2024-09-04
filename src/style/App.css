@@ -1,6 +1,7 @@
 :root {
-  --primary-color: #06836c;
-  --secondary-color: rgb(255, 253, 186);
+  --primary-color: #25817e;
+  --secondary-color: #f3f5b9;
+  --secondary-color-hover: #ffc62f;
   --accent-color: #0a68f4;
   --accent-color-light: #03c256;
   --error-color: #f40a0e;
@@ -24,8 +25,6 @@
   flex-direction: column;
   grid-column: span 2 / span 2;
   /* grid-area: left; */
-  filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03))
-    drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
   height: 100%;
   overflow: auto;
 }
@@ -34,7 +33,7 @@
   display: flex;
   flex-direction: column;
   background-color: var(--secondary-color);
-  /* grid-area: right; */
+  box-shadow: -10px 0 10px rgba(0, 0, 0, 0.5);
   grid-column: span 8 / span 8;
   padding: 10px;
   border-radius: 20px 0px;
@@ -73,7 +72,9 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  justify-content: center;
+  padding: 10px;
+
+  justify-content: start;
   justify-items: center;
   color: var(--text-color-light);
   overflow-y: auto;
@@ -83,10 +84,13 @@
 .items-img > .item-img {
   display: flex;
   padding: 10px;
+  justify-items: center;
+  background: var(--accent-color-light);
   filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03))
     drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
   transition: transform 0.2s ease;
   cursor: pointer;
+  border-radius: 10px;
 }
 
 .items-img > .item-img:hover {
@@ -96,6 +100,8 @@
 .items-img > .item-img > img {
   display: flex;
   flex-direction: column;
+  width: 30px;
+  height: 30px;
 }
 
 .items-img > .item-img > div {
@@ -209,7 +215,9 @@
 .submit {
   display: flex;
   justify-items: center;
+  justify-content: center;
   padding: 12px;
+  gap: 15px;
   text-align: center;
   font-size: 1.1rem;
   margin-top: 10px;
@@ -222,7 +230,32 @@
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }
-
+.export-btn {
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  padding: 12px;
+  gap: 15px;
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  background-color: var(--accent-color);
+  color: azure;
+  border: 0;
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.export-btn > div {
+  white-space: nowrap;
+  margin: auto;
+}
+.export-btn > svg {
+  width: 20px;
+  height: 20px;
+}
 .btn {
   padding: 10px 20px;
   text-align: center;
@@ -301,7 +334,8 @@ table {
 th,
 td {
   padding: 5px;
-  border-bottom: 1px solid white;
+  border: 1px solid white;
+  font-size: 12px;
 }
 
 th {
@@ -309,6 +343,8 @@ th {
   color: var(--text-color-light);
   text-align: center;
   text-transform: uppercase;
+  font-size: 14px;
+  color: #ddd;
 }
 .sticky {
   position: sticky;
@@ -321,11 +357,11 @@ th {
   z-index: 2;
 }
 tr:nth-child(odd) {
-  background-color: rgba(11, 209, 173, 0.1);
+  background-color: #3fae9b67;
 }
 
 tr:nth-child(even) {
-  background-color: #0bd1ad;
+  background-color: #57ae9e5b;
 }
 
 tr:hover {
@@ -365,6 +401,31 @@ tr:hover {
   td {
     font-size: 10px;
   }
+}
+.file-input {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  width: 95%;
+  height: 100px;
+  background: var(--secondary-color);
+  margin: 10px auto;
+  text-align: center;
+  /* color: #fff; */
+  filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03))
+    drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
+  border: 2;
+  border-style: dashed;
+  border-radius: 10px;
+  margin: 10;
+  cursor: pointer;
+}
+.file-input:hover {
+  background: var(--secondary-color-hover);
+  color: #ffffff;
+}
+.file-input > div {
+  margin: auto;
 }
 
 @media screen and (max-width: 1528px) {

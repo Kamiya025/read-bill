@@ -9,7 +9,8 @@ export const useUploadMutation = (setSubmissionID: (e: string[]) => void) => {
     mutationFn: (formData: FormData) => uploadApi.uploadFile(formData),
     onError: (error: AxiosError) => {
       console.error("Error uploading file:", error)
-      alert("Error uploading file. Please try again.")
+      alert("Tải file lên thất bại.")
+      setSubmissionID([])
     },
     onSuccess: (data: IUploadResponse) => {
       if (
@@ -29,15 +30,13 @@ export const useCheckBillMutation = (
   return useMutation<IRootBillObject, AxiosError, IBillForCheck>({
     mutationFn: (formData) => uploadApi.getDataBill(formData),
     onError: (error: AxiosError) => {
-      console.error("Error uploading file:", error)
-      alert("Error uploading file. Please try again.")
+      alert("Kiểm tra thông tin thất bại")
     },
     onSuccess: (data: IRootBillObject) => {
       if (data.hddt) {
         onSuccess(data)
-        // setSubmissionID(data.success_submission_ids ?? [])
       } else {
-        alert("File upload failed.")
+        alert("Kiểm tra thông tin thất bại")
       }
     },
   })
@@ -79,7 +78,7 @@ export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
     const sourceRow = worksheet.getRow(startRowIndex)
     // Dịch chuyển các hàng hiện tại xuống phía dưới
     // Dịch chuyển các hàng hiện tại xuống phía dưới
-    if (newData.length > 1)
+    if (newData.length > 1) {
       for (let i = worksheet.rowCount; i > startRowIndex; i--) {
         const row = worksheet.getRow(i)
         const newRow = worksheet.getRow(i + newData.length) // Dịch chuyển xuống hàng
@@ -88,6 +87,7 @@ export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
         row.commit()
         newRow.commit()
       }
+    }
 
     // Thêm dữ liệu mới vào các hàng xác định và áp dụng style từ hàng 3
     newData.forEach((rowData, index) => {
