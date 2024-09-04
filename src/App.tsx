@@ -36,32 +36,50 @@ function App() {
       setFilesSelected(undefined)
       setExportData([])
       return
+    } else {
+      setSubmissionsID(undefined)
+      setExportData([])
+      const formData = new FormData()
+      setFilesSelected(Array.from(files))
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name)
+      }
+      mutation.mutate(formData)
     }
-    const formData = new FormData()
-    setFilesSelected(Array.from(files))
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i], files[i].name)
-    }
-    mutation.mutate(formData)
   }
 
   return (
     <>
       <div className="App">
         <div className="left">
-          <label>
-            <input
-              accept="image/*,application/pdf"
-              type="file"
-              placeholder="Chọn tệp"
-              onChange={handleFileUpload}
-              multiple
-              hidden
-            />
-            <div className="file-input">
-              <div>Chọn/Kéo thả tệp vào đây</div>
+          <div>
+            <label>
+              <input
+                accept="image/*,application/pdf"
+                type="file"
+                placeholder="Chọn tệp"
+                onChange={handleFileUpload}
+                multiple
+                hidden
+              />
+              <div className="file-input">
+                <div>Chọn/Kéo thả tệp vào đây</div>
+              </div>
+            </label>
+            <div className="clear">
+              <button
+                className="clear-btn"
+                onClick={() => {
+                  setSubmissionsID(undefined)
+                  setFilesSelected(undefined)
+                  setExportData([])
+                }}
+              >
+                Clear
+              </button>
             </div>
-          </label>
+          </div>
           <div className="items-img">
             {filesSelected &&
               filesSelected.map((file, index) => (
