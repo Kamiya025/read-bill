@@ -63,7 +63,10 @@ const repalceValueRow = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
     targetCell.style = JSON.parse(JSON.stringify(targetCell.style)) // Sao chép toàn bộ style từ cell nguồn
   })
 }
-export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
+export const addDataToExcelFile = async (
+  filePath: string,
+  newData: string[][]
+) => {
   try {
     // Tải file từ thư mục public
     const response = await fetch(filePath)
@@ -78,17 +81,11 @@ export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
     const sourceRow = worksheet.getRow(startRowIndex)
     // Dịch chuyển các hàng hiện tại xuống phía dưới
     // Dịch chuyển các hàng hiện tại xuống phía dưới
-    if (newData.length > 1) {
-      for (let i = worksheet.rowCount; i > startRowIndex; i--) {
-        const row = worksheet.getRow(i)
-        const newRow = worksheet.getRow(i + newData.length) // Dịch chuyển xuống hàng
-        copyRow(row, newRow)
-        copyRowStyle(sourceRow, row)
-        row.commit()
-        newRow.commit()
-      }
-    }
-
+    newData.forEach((_, index) => {
+      const row = worksheet.getRow(startRowIndex + index)
+      copyRowStyle(sourceRow, row)
+      row.commit()
+    })
     // Thêm dữ liệu mới vào các hàng xác định và áp dụng style từ hàng 3
     newData.forEach((rowData, index) => {
       const row = worksheet.getRow(startRowIndex + index)
