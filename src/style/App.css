@@ -335,18 +335,35 @@ tr:hover {
 /* Responsive styling */
 @media screen and (max-width: 600px) {
   .App {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "left"
-      "right";
+    display: block;
+    height: auto;
+    position: relative;
+  }
+  .right {
+    padding: 0px;
   }
   table {
     width: 100%;
   }
-
+  .left {
+    position: relative;
+  }
+  .items-img {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 90vw;
+    height: 100vh;
+    background: #000;
+    z-index: 100;
+    display: none;
+  }
+  .right > .export > div {
+    font-size: 20px;
+  }
   th,
   td {
-    font-size: 14px;
+    font-size: 10px;
   }
 }
 

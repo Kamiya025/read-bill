@@ -1,46 +1,56 @@
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import {
-  IBillForCheck,
   IBillConfidenceScore,
+  IBillForCheck,
   IRootBillObject,
 } from "../api/model"
 import { allKeys, useGetData } from "../api/query"
-import GetDataBillWrapper, { ChildActionProps } from "./ViewDataBill"
-import ViewBillGet from "./ViewDataGet"
 import { useCheckBillMutation } from "../hook"
+import ViewBillGet from "./ViewDataGet"
 
 function traverseDataSets(
-  dataSets: any,
-  tag: any,
-  output: {
-    [key: string]: {
+  dataSets: any[],
+  tag = "",
+  output: Record<
+    string,
+    {
       value: string
       normalized_value: any
       label: string
       display_name: string
       confidence_score: number
     }
-  }
+  >
 ) {
-  for (let dataSet of dataSets) {
-    let { service_label, data_set, value, normalized_value, confidence_score } =
-      dataSet
-    let { label, display_name } = service_label
-    let newTag = tag ? `${tag}.${label}` : label
-    if (data_set) traverseDataSets(data_set, newTag, output)
-    else
-      output[newTag] = {
-        value,
-        normalized_value,
-        label: newTag,
-        display_name,
-        confidence_score,
+  dataSets.forEach(
+    ({
+      service_label,
+      data_set,
+      value,
+      normalized_value,
+      confidence_score,
+    }) => {
+      const newTag = tag ? `${tag}.${service_label.label}` : service_label.label
+      if (data_set) {
+        traverseDataSets(data_set, newTag, output)
+      } else {
+        output[newTag] = {
+          value,
+          normalized_value,
+          label: newTag,
+          display_name: service_label.display_name,
+          confidence_score,
+        }
       }
-  }
+    }
+  )
 }
 
-function GetDataWrapper(props: { submissionID: string }) {
+function GetDataWrapper(props: {
+  submissionID: string
+  onChange: (data: { data?: IBillForCheck; bonus?: IRootBillObject }) => void
+}) {
   const [dataSet, setDataSet] = useState<{
     data?: IBillForCheck
     submit?: IBillForCheck
@@ -64,6 +74,9 @@ function GetDataWrapper(props: { submissionID: string }) {
       bonus: data,
     }))
   })
+  useEffect(() => {
+    props.onChange(dataSet)
+  }, [dataSet])
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined
 

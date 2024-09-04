@@ -42,45 +42,48 @@ export const useCheckBillMutation = (
     },
   })
 }
+
 const copyRowStyle = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
   sourceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
     const targetCell = targetRow.getCell(colNumber)
-    targetCell.style = cell.style // Sao chép style từ hàng nguồn
+    targetCell.value = ""
+    targetCell.style = JSON.parse(JSON.stringify(cell.style)) // Sao chép toàn bộ style từ cell nguồn
   })
 }
-const fetchExcelFile = async (filePath: string) => {
-  const response = await fetch(filePath)
-  if (!response.ok) throw new Error("Network response was not ok")
-  const arrayBuffer = await response.arrayBuffer()
-  return new Uint8Array(arrayBuffer)
+const copyRow = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
+  sourceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+    const targetCell = targetRow.getCell(colNumber)
+    targetCell.value = cell.value
+    targetCell.style = JSON.parse(JSON.stringify(cell.style)) // Sao chép toàn bộ style từ cell nguồn
+  })
 }
-// Thêm dữ liệu vào file .xlsx và tải xuống
-const addDataToExcelFile = async (filePath: string, newData: any[]) => {
+const repalceValueRow = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
+  sourceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+    const targetCell = targetRow.getCell(colNumber)
+    targetCell.value = cell.value
+    targetCell.style = JSON.parse(JSON.stringify(targetCell.style)) // Sao chép toàn bộ style từ cell nguồn
+  })
+}
+export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
   try {
     // Tải file từ thư mục public
     const response = await fetch(filePath)
     if (!response.ok) throw new Error("Network response was not ok")
     const arrayBuffer = await response.arrayBuffer()
-
     // Tạo workbook và worksheet
     const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.load(arrayBuffer)
     const worksheet = workbook.worksheets[0]
-
     // Xác định hàng chèn vào và hàng nguồn để sao chép style
     const startRowIndex = 3 // Thêm dữ liệu vào từ hàng thứ 3
     const sourceRow = worksheet.getRow(startRowIndex)
-
     // Dịch chuyển các hàng hiện tại xuống phía dưới
-    const rowsToMove = worksheet.rowCount - startRowIndex
-
+    // Dịch chuyển các hàng hiện tại xuống phía dưới
     for (let i = worksheet.rowCount; i >= startRowIndex; i--) {
       const row = worksheet.getRow(i)
       const newRow = worksheet.getRow(i + newData.length) // Dịch chuyển xuống hàng
-      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        newRow.getCell(colNumber).value = cell.value
-        newRow.getCell(colNumber).style = cell.style // Giữ nguyên style
-      })
+      copyRow(row, newRow)
+      copyRowStyle(sourceRow, row)
       row.commit()
       newRow.commit()
     }
@@ -88,91 +91,26 @@ const addDataToExcelFile = async (filePath: string, newData: any[]) => {
     // Thêm dữ liệu mới vào các hàng xác định và áp dụng style từ hàng 3
     newData.forEach((rowData, index) => {
       const row = worksheet.getRow(startRowIndex + index)
-      row.values = rowData
-
-      // Sao chép style từ hàng 3 cho các hàng mới
-      copyRowStyle(worksheet.getRow(0), row)
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const newCell = row.getCell(colNumber)
+        newCell.value = rowData[colNumber - 1] || cell.value // Giữ nguyên giá trị cũ nếu không có dữ liệu mới
+        // Giữ nguyên style của hàng hiện tại
+        newCell.style = { ...cell.style }
+      })
       row.commit()
     })
-
     // Tạo file mới và tải xuống
     const updatedWorkbook = await workbook.xlsx.writeBuffer()
     const blob = new Blob([updatedWorkbook], {
       type: "application/octet-stream",
     })
-    const url = URL.createObjectURL(blob)
-
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "updated_file.xlsx"
-    a.click()
-    URL.revokeObjectURL(url)
+    createFileDownload(blob, "updated_file.xlsx")
   } catch (error) {
     console.error("Error adding data to Excel file:", error)
   }
 }
 
-// Tạo và xuất file .xlsx mới
-export const handleExport = () => {
-  // Dữ liệu mẫu tương tự như file của bạn
-  const data = [
-    [
-      "Ký hiệu hóa đơn",
-      "Số hóa đơn",
-      "Tổng tiền thanh toán",
-      "Mã số thuế Đơn vị phát hành",
-      "Tên Đơn vị phát hành hóa đơn",
-      "Tình trạng hóa đơn",
-      "Tình trạng bên phát hành",
-      "Tên khách hàng mua",
-      "Mã số thuế khách hàng mua",
-      "Tình trạng khách hàng mua",
-      "Time tra cứu",
-    ],
-    [
-      "Ký hiệu hóa đơn",
-      "Số hóa đơn",
-      "Tổng tiền thanh toán",
-      "Mã số thuế Đơn vị phát hành",
-      "Tên Đơn vị phát hành hóa đơn",
-      "Tình trạng hóa đơn",
-      "Tình trạng bên phát hành",
-      "Tên khách hàng mua",
-      "Mã số thuế khách hàng mua",
-      "Tình trạng khách hàng mua",
-      "Time tra cứu",
-    ],
-    [
-      "Ký hiệu hóa đơn",
-      "Số hóa đơn",
-      "Tổng tiền thanh toán",
-      "Mã số thuế Đơn vị phát hành",
-      "Tên Đơn vị phát hành hóa đơn",
-      "Tình trạng hóa đơn",
-      "Tình trạng bên phát hành",
-      "Tên khách hàng mua",
-      "Mã số thuế khách hàng mua",
-      "Tình trạng khách hàng mua",
-      "Time tra cứu",
-    ],
-    [
-      "Ký hiệu hóa đơn",
-      "Số hóa đơn",
-      "Tổng tiền thanh toán",
-      "Mã số thuế Đơn vị phát hành",
-      "Tên Đơn vị phát hành hóa đơn",
-      "Tình trạng hóa đơn",
-      "Tình trạng bên phát hành",
-      "Tên khách hàng mua",
-      "Mã số thuế khách hàng mua",
-      "Tình trạng khách hàng mua",
-      "Time tra cứu",
-    ],
-  ]
-  addDataToExcelFile("/example.xlsx", data)
-}
-
-export function createFileDownload(blob: Blob, nameFile: string) {
+function createFileDownload(blob: Blob, nameFile: string) {
   try {
     {
       try {

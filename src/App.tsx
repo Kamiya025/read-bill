@@ -1,23 +1,36 @@
 import { useState } from "react"
-import "./style/App.css"
-import { handleExport, useUploadMutation } from "./hook"
 import GetDataWrapper from "./components/ViewData"
+import { addDataToExcelFile, useUploadMutation } from "./hook"
+import "./style/App.css"
 
 function App() {
-  const [submissionID, setSubmissionID] = useState<string[] | undefined>(
+  const [submissionsID, setSubmissionsID] = useState<string[] | undefined>(
     undefined
   )
+  const [exportData, setExportData] = useState<
+    { id: string; data: string[] }[]
+  >([])
   const [filesSelected, setFilesSelected] = useState<File[] | undefined>(
     undefined
   )
-  const mutation = useUploadMutation(setSubmissionID)
-
+  const mutation = useUploadMutation((data) => {
+    setSubmissionsID(data)
+    setExportData(data.map((e) => ({ id: e, data: [] })))
+  })
+  const updateExportData = (id: string, newData: string[]) => {
+    setExportData((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, data: newData } : item
+      )
+    )
+  }
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? e.target.files : null
     if (!files) {
       alert("Please select a file first!")
-      setSubmissionID(undefined)
+      setSubmissionsID(undefined)
       setFilesSelected(undefined)
+      setExportData([])
       return
     }
     const formData = new FormData()
@@ -76,7 +89,10 @@ function App() {
             <button
               className="submit"
               onClick={() => {
-                handleExport()
+                addDataToExcelFile(
+                  "/example.xlsx",
+                  exportData.map((e) => e.data)
+                )
               }}
             >
               Xuất file
@@ -97,10 +113,27 @@ function App() {
                 <th>Thời gian tra cứu</th>
                 <th className="sticky-x"></th>
               </tr>
-              {submissionID && (
+              {submissionsID && (
                 <>
-                  {submissionID.map((e) => (
-                    <GetDataWrapper submissionID={e} />
+                  {submissionsID.map((id) => (
+                    <GetDataWrapper
+                      key={id}
+                      submissionID={id}
+                      onChange={(data) => {
+                        const newData: string[] = [
+                          data.data?.khhdon_last ?? "",
+                          data.data?.shdon ?? "",
+                          data.data?.tgtttbso ?? "",
+                          data.data?.nbmst ?? "",
+                          data.data?.nbten ?? "",
+                          String(data.bonus?.hddt.status) ?? "",
+                          data.data?.nmten ?? "",
+                          "",
+                          data.bonus?.time ?? "",
+                        ]
+                        updateExportData(id, newData)
+                      }}
+                    />
                   ))}
                 </>
               )}
