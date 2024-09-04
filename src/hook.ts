@@ -79,14 +79,15 @@ export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
     const sourceRow = worksheet.getRow(startRowIndex)
     // Dịch chuyển các hàng hiện tại xuống phía dưới
     // Dịch chuyển các hàng hiện tại xuống phía dưới
-    for (let i = worksheet.rowCount; i >= startRowIndex; i--) {
-      const row = worksheet.getRow(i)
-      const newRow = worksheet.getRow(i + newData.length) // Dịch chuyển xuống hàng
-      copyRow(row, newRow)
-      copyRowStyle(sourceRow, row)
-      row.commit()
-      newRow.commit()
-    }
+    if (newData.length > 1)
+      for (let i = worksheet.rowCount; i > startRowIndex; i--) {
+        const row = worksheet.getRow(i)
+        const newRow = worksheet.getRow(i + newData.length) // Dịch chuyển xuống hàng
+        copyRow(row, newRow)
+        copyRowStyle(sourceRow, row)
+        row.commit()
+        newRow.commit()
+      }
 
     // Thêm dữ liệu mới vào các hàng xác định và áp dụng style từ hàng 3
     newData.forEach((rowData, index) => {
@@ -104,7 +105,7 @@ export const addDataToExcelFile = async (filePath: string, newData: any[]) => {
     const blob = new Blob([updatedWorkbook], {
       type: "application/octet-stream",
     })
-    createFileDownload(blob, "updated_file.xlsx")
+    createFileDownload(blob, "export_file.xlsx")
   } catch (error) {
     console.error("Error adding data to Excel file:", error)
   }
