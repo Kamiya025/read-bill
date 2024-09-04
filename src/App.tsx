@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import GetDataWrapper from "./components/ViewData"
 import { addDataToExcelFile, useUploadMutation } from "./hook"
 import "./style/App.css"
+import { covertCode } from "./common"
 
 function App() {
   const [submissionsID, setSubmissionsID] = useState<string[] | undefined>(
@@ -132,17 +133,21 @@ function App() {
                       submissionID={id}
                       onChange={(data) => {
                         const newData: string[] = [
-                          data.data?.khhdon_last ?? " ",
-                          data.data?.shdon ?? " ",
-                          data.data?.tgtttbso ?? " ",
-                          data.data?.nbmst ?? " ",
-                          data.data?.nbten ?? " ",
-                          data.bonus?.hddt.status?.toString() ?? " ",
-                          " ",
-                          data.data?.nmten ?? " ",
-                          " ",
-                          " ",
-                          data.bonus?.time ?? " ",
+                          data.data?.khhdon_last ?? "",
+                          data.data?.shdon ?? "",
+                          data.data?.tgtttbso ?? "",
+                          data.data?.nbmst ?? "",
+                          data.data?.nbten ?? "",
+                          data.bonus?.hddt.status?.toString() ?? "",
+                          covertCode(
+                            data.bonus?.hddt.code,
+                            data.bonus?.hddt.status
+                          ) ?? "",
+                          "",
+                          data.data?.nmten ?? "",
+                          "",
+                          "",
+                          data.bonus?.time ?? "",
                         ]
                         updateExportData(id, newData)
                       }}
