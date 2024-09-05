@@ -127,6 +127,7 @@
 
 .items-img > .item-img > div {
   height: auto;
+  word-break: break-all;
   flex-grow: 1;
 }
 
@@ -297,7 +298,14 @@
 .submit:active {
   background-color: #027936;
 }
-
+.note {
+  white-space: pre-line;
+  width: 150px;
+}
+.file-td {
+  word-break: break-all;
+  width: 100px;
+}
 .input {
   background-color: "#fff000";
   padding: 18;

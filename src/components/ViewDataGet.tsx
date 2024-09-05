@@ -5,7 +5,7 @@ import {
   IFile,
   IRootBillObject,
 } from "../api/model"
-import { covertCode } from "../common"
+import { covertCode, getEInvoiceNote } from "../common"
 
 export const ViewBillGet = (props: {
   file?: IFile
@@ -55,7 +55,7 @@ export const ViewBillGet = (props: {
           <div className="title">Tra cứu hóa đơn</div>
           <div className="content"> */}
         <>
-          <td>{props.file?.name}</td>
+          <td className="file-td">{props.file?.name}</td>
           <td>
             {/* <Input
               label="Loại Hóa đơn"
@@ -156,9 +156,7 @@ export const ViewBillGet = (props: {
           </td>
           <td>{dataSetSubmit.data?.nbten ?? ""}</td>
           <td>{props.bonus?.hddt.status}</td>
-          <td>
-            {covertCode(props.bonus?.hddt.code, props.bonus?.hddt.status)}
-          </td>
+          <td className="note">{getEInvoiceNote(props.bonus?.hddt)}</td>
           <td>{props.dataSet?.nmten ?? ""}</td>
           <td>{props.bonus?.time}</td>
           <td className="sticky-x">

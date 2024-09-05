@@ -102,12 +102,12 @@ function GetDataWrapper(props: {
             khhdon_last:
               output["invoice_data.serial_no"]?.value?.substring(1) ?? "",
             shdon: output["invoice_data.invoice_no"]?.value ?? "",
-            tgtttbso: output["invoice_data.total_amount"]?.value
+            tgtttbso: output["invoice_data.sub_total"]?.value
               ? String(
-                  Math.floor(Number(output["invoice_data.total_amount"]?.value))
+                  Math.floor(Number(output["invoice_data.sub_total"]?.value))
                 )
               : String(
-                  Math.floor(Number(output["invoice_data.sub_total"]?.value))
+                  Math.floor(Number(output["invoice_data.total_amount"]?.value))
                 ),
             nbten: output["supplier_data.supplier"]?.value ?? "",
             nmten:

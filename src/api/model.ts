@@ -103,7 +103,7 @@ interface Nnt {
   value: string
 }
 
-interface Hddt {
+export interface Hddt {
   code: number
   status?: number
   reason: string
