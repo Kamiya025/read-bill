@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import ExcelJS from "exceljs"
+import * as XLSX from "xlsx"
 import { IBillForCheck, IRootBillObject, IUploadResponse } from "./api/model"
 import uploadApi from "./api/upload-api"
 
@@ -77,7 +78,7 @@ export const addDataToExcelFile = async (
     await workbook.xlsx.load(arrayBuffer)
     const worksheet = workbook.worksheets[0]
     // Xác định hàng chèn vào và hàng nguồn để sao chép style
-    const startRowIndex = 3 // Thêm dữ liệu vào từ hàng thứ 3
+    const startRowIndex = 2 // Thêm dữ liệu vào từ hàng thứ 3
     const sourceRow = worksheet.getRow(startRowIndex)
     // Dịch chuyển các hàng hiện tại xuống phía dưới
     // Dịch chuyển các hàng hiện tại xuống phía dưới
@@ -105,6 +106,38 @@ export const addDataToExcelFile = async (
     createFileDownload(blob, "export_file.xlsx")
   } catch (error) {
     console.error("Error adding data to Excel file:", error)
+  }
+}
+
+export async function readFile(file: File): Promise<IBillForCheck[]> {
+  if (!file) return []
+  try {
+    const buffer = await file.arrayBuffer()
+    const workbook = XLSX.read(buffer)
+    let indexSheetTemplate = 0
+    let listData: IBillForCheck[] = []
+
+    if (indexSheetTemplate >= 0) {
+      const sheet = workbook.Sheets[workbook.SheetNames[indexSheetTemplate]]
+      // Chuyển dữ liệu từ sheet thành JSON
+      let data = XLSX.utils.sheet_to_json<any>(sheet)
+      // Xử lý dữ liệu theo yêu cầu
+
+      listData = data.map((val: any) => ({
+        nbmst: val["Mã số thuế Đơn vị phát hành "] ?? "",
+        khhdon_first: String(val["Ký hiệu hóa đơn"] ?? "").charAt(0),
+        khhdon_last: String(val["Ký hiệu hóa đơn"] ?? "").substring(1),
+        shdon: val["Số hóa đơn"] ?? "",
+        tgtttbso: val["Tổng tiền thanh toán"] ?? "",
+        nbten: val["Tên Đơn vị phát hành hóa đơn "] ?? "",
+        nmten: val["Tên khách hàng mua"] ?? "",
+      }))
+    }
+
+    return listData
+  } catch (error) {
+    console.error("Error reading file:", error)
+    return []
   }
 }
 
