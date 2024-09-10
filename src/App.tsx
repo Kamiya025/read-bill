@@ -33,14 +33,17 @@ function App() {
       )
     )
   }
+  const clearAllState = () => {
+    setSubmissionsID(undefined)
+    setFilesSelected(undefined)
+    setDataFileImported(undefined)
+    setExportData([])
+  }
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? e.target.files : null
     if (!files) {
       alert("Please select a file first!")
-      setSubmissionsID(undefined)
-      setFilesSelected(undefined)
-      setDataFileImported(undefined)
-      setExportData([])
+      clearAllState()
       return
     } else {
       setDataFileImported(undefined)
@@ -63,10 +66,7 @@ function App() {
 
     if (!file) {
       alert("Please select a file first!")
-      setSubmissionsID(undefined)
-      setFilesSelected(undefined)
-      setExportData([])
-      setDataFileImported(undefined)
+      clearAllState()
       return
     }
 

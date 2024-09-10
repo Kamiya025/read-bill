@@ -1,4 +1,4 @@
-import { getEInvoiceNote } from "../common"
+import { getEInvoiceNote } from "./common"
 import GetDataWrapper from "./ViewData"
 
 export const TableBill = (props: {

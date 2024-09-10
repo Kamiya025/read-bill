@@ -1,4 +1,4 @@
-import { Hddt } from "./api/model"
+import { Hddt } from "../api/model"
 
 export function covertCode(code: number | undefined, status?: number) {
   if (code === 0) return "Hóa đơn không tồn tại"

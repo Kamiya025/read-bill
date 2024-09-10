@@ -68,14 +68,15 @@ function GetDataWrapper(props: {
   const getDataBySubmission = useGetData(props.submissionID)
   const debounce = 1000
   const queryClient = useQueryClient()
-  const mutation = useCheckBillMutation((data) => {
+  const mutation = useCheckBillMutation((data, variables) => {
     setDataSet((pre) => ({
       ...pre,
+      data: variables,
       bonus: data,
     }))
   })
   useEffect(() => {
-    props.onChange(dataSet)
+    if (dataSet.data || dataSet.bonus) props.onChange(dataSet)
   }, [dataSet])
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined
@@ -186,7 +187,6 @@ function GetDataWrapper(props: {
           isLoadingSubmit={mutation.isPending}
           submit={(submit) => {
             setDataSet((pre) => ({ ...pre, submit }))
-
             mutation.mutate(submit)
           }}
           dataSetConfidenceScore={dataSet.score}

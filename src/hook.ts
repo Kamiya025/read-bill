@@ -26,16 +26,16 @@ export const useUploadMutation = (setSubmissionID: (e: string[]) => void) => {
   })
 }
 export const useCheckBillMutation = (
-  onSuccess: (data: IRootBillObject) => void
+  onSuccess: (data: IRootBillObject, variables: IBillForCheck) => void
 ) => {
   return useMutation<IRootBillObject, AxiosError, IBillForCheck>({
     mutationFn: (formData) => uploadApi.getDataBill(formData),
     onError: (error: AxiosError) => {
       alert("Kiểm tra thông tin thất bại")
     },
-    onSuccess: (data: IRootBillObject) => {
+    onSuccess: (data: IRootBillObject, variables) => {
       if (data.hddt) {
-        onSuccess(data)
+        onSuccess(data, variables)
       } else {
         alert("Kiểm tra thông tin thất bại")
       }

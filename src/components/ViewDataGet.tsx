@@ -5,7 +5,7 @@ import {
   IFile,
   IRootBillObject,
 } from "../api/model"
-import { covertCode, getEInvoiceNote } from "../common"
+import { covertCode, getEInvoiceNote } from "./common"
 
 export const ViewBillGet = (props: {
   file?: IFile

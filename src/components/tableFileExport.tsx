@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { IBillForCheck, IRootBillObject } from "../api/model"
-import { getEInvoiceNote } from "../common"
+import { getEInvoiceNote } from "./common"
 import { useCheckBillMutation } from "../hook"
 import ViewBillGet, { ViewBillGet2 } from "./ViewDataGet"
 
