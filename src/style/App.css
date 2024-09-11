@@ -1,5 +1,6 @@
 :root {
   --primary-color: #25817e;
+  --primary-color-dark: #1c5f5d;
   --secondary-color: #f5f3b9;
   --secondary-color-hover: #ffc62f;
   --accent-color: #0a68f4;
@@ -243,6 +244,23 @@
   width: 35px;
   height: 35px;
 }
+.submit-none {
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 10px;
+  aspect-ratio: 1 / 1;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.submit-none:hover {
+  background: #73727217;
+}
+.submit-none > svg {
+  width: 15px;
+}
 .submit {
   display: flex;
   justify-items: center;
@@ -271,7 +289,6 @@
   text-align: center;
   font-size: 1.1rem;
   margin-top: 10px;
-  background-color: var(--accent-color);
   color: azure;
   border: 0;
   border-radius: 20px;
@@ -285,11 +302,22 @@
   background: var(--primary-color);
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
+.export-btn:hover {
+  background: var(--primary-color-dark);
+}
 .fixed-btn {
   position: fixed;
   right: 10px;
   bottom: 20px;
   z-index: 1000;
+  transition-delay: 1s;
+  transform-style: flat;
+}
+.fixed-btn > .export-btn > div {
+  display: none;
+}
+.fixed-btn > .export-btn:hover > div {
+  display: block;
 }
 .export-btn > div {
   white-space: nowrap;
@@ -345,8 +373,15 @@
   background: none;
   border-color: #737272;
   border-bottom-width: 1px;
+  max-width: 100px;
 }
-
+.input-bill-short {
+  width: 15px;
+}
+.flex {
+  display: inline-flex;
+  gap: 12px;
+}
 .input-bill:focus {
   outline: none;
   border-color: var(--accent-color);
@@ -383,7 +418,7 @@ table {
 
 th,
 td {
-  padding: 5px;
+  padding: 15px 5px;
   border: 1px solid white;
   font-size: 12px;
 }
@@ -455,6 +490,7 @@ tr:hover {
 .file-input {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   justify-items: center;
   width: 95%;
   height: 100px;
@@ -476,6 +512,9 @@ tr:hover {
 }
 .file-input > div {
   margin: auto;
+}
+.file-input > div > svg {
+  width: 35px;
 }
 
 @media screen and (max-width: 1528px) {

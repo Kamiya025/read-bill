@@ -91,11 +91,15 @@ export interface IBillConfidenceScore {
   tgtttbso: number
 }
 
-export interface IRootBillObject {
+export interface IEinvoiceData {
   hddt: Hddt
   nnt: Nnt[]
-  description: string
+  nbmst: string
+  khhdon: string
+  shdon: string
+  tgtttbso: string
   time: string
+  refInvoice: RefInvoice[]
 }
 
 interface Nnt {
@@ -115,4 +119,25 @@ export interface Hddt {
     EInvoiceCode: string
     EInvoiceNoCode: string
   }[]
+}
+export interface IEinvoices {
+  einvoices: IEinvoice[]
+  description: string
+}
+
+interface RefInvoice {
+  EInvoiceNo: number
+  EInvoiceCode: string
+  EInvoiceNoCode: number
+}
+
+interface IEinvoice {
+  statusCode: number
+  data: IEinvoiceData
+}
+
+interface RefInvoice {
+  EInvoiceNo: number
+  EInvoiceCode: string
+  EInvoiceNoCode: number
 }

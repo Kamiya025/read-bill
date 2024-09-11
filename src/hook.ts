@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import ExcelJS from "exceljs"
 import * as XLSX from "xlsx"
-import { IBillForCheck, IRootBillObject, IUploadResponse } from "./api/model"
+import { IBillForCheck, IEinvoiceData, IUploadResponse } from "./api/model"
 import uploadApi from "./api/upload-api"
 
 export const useUploadMutation = (setSubmissionID: (e: string[]) => void) => {
@@ -26,14 +26,14 @@ export const useUploadMutation = (setSubmissionID: (e: string[]) => void) => {
   })
 }
 export const useCheckBillMutation = (
-  onSuccess: (data: IRootBillObject, variables: IBillForCheck) => void
+  onSuccess: (data: IEinvoiceData, variables: IBillForCheck) => void
 ) => {
-  return useMutation<IRootBillObject, AxiosError, IBillForCheck>({
+  return useMutation<IEinvoiceData, AxiosError, IBillForCheck>({
     mutationFn: (formData) => uploadApi.getDataBill(formData),
     onError: (error: AxiosError) => {
-      alert("Kiểm tra thông tin thất bại")
+      // alert("Kiểm tra thông tin thất bại")
     },
-    onSuccess: (data: IRootBillObject, variables) => {
+    onSuccess: (data: IEinvoiceData, variables) => {
       if (data.hddt) {
         onSuccess(data, variables)
       } else {

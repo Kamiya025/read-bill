@@ -2,7 +2,8 @@ import axios from "axios"
 import axiosClient from "./axios-client"
 import {
   IBillForCheck,
-  IRootBillObject,
+  IEinvoices,
+  IEinvoiceData,
   IUploadBody,
   IUploadResponse,
   RootObjectDataSubmission,
@@ -22,7 +23,7 @@ const uploadApi = {
 
     return axiosClient.get(url)
   },
-  getDataBill(params: IBillForCheck): Promise<IRootBillObject> {
+  getDataBill(params: IBillForCheck): Promise<IEinvoiceData> {
     const url = `https://api.matchs.vnest.vn/api`
 
     return axiosClient.get(url, {
@@ -33,6 +34,18 @@ const uploadApi = {
         tgtttbso: params.tgtttbso,
       },
     })
+  },
+  checkListDataBill(listData: IBillForCheck[]): Promise<IEinvoices> {
+    const url = `https://api.matchs.vnest.vn/api`
+    return axiosClient.post(
+      url,
+      listData.map((e) => ({
+        nbmst: e.nbmst,
+        khhdon: e.khhdon_last,
+        shdon: e.shdon,
+        tgtttbso: e.tgtttbso,
+      }))
+    )
   },
 }
 export default uploadApi

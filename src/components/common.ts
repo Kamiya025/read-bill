@@ -1,4 +1,4 @@
-import { Hddt } from "../api/model"
+import { Hddt, IBillForCheck, IEinvoiceData } from "../api/model"
 
 export function covertCode(code: number | undefined, status?: number) {
   if (code === 0) return "Hóa đơn không tồn tại"
@@ -54,4 +54,26 @@ export function getEInvoiceNote(hddt: Hddt | undefined): string {
     retMsg += `\nHóa đơn liên quan:\nSố hóa đơn: ${EInvoiceNo}\nKý hiệu hóa đơn: ${EInvoiceNoCode}${EInvoiceCode}`
   }
   return retMsg
+}
+export const checkValidate = (data?: IBillForCheck) => {
+  return data && data.nbmst && data.khhdon_last && data.shdon && data.tgtttbso
+}
+export const convertValueExport = (data: {
+  data?: IBillForCheck
+  bonus?: IEinvoiceData
+}) => {
+  return [
+    (data.data?.khhdon_first ?? " ") + (data.data?.khhdon_last ?? ""),
+    data.data?.shdon ?? "",
+    data.data?.tgtttbso ?? "",
+    data.data?.nbmst ?? "",
+    data.data?.nbten ?? "",
+    data.bonus?.hddt?.status?.toString() ?? "",
+    getEInvoiceNote(data.bonus?.hddt) ?? "",
+    "",
+    data.data?.nmten ?? "",
+    "",
+    "",
+    data.bonus?.time ?? "",
+  ]
 }

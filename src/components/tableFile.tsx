@@ -1,4 +1,4 @@
-import { getEInvoiceNote } from "./common"
+import { convertValueExport, getEInvoiceNote } from "./common"
 import GetDataWrapper from "./ViewData"
 
 export const TableBill = (props: {
@@ -29,21 +29,7 @@ export const TableBill = (props: {
                 key={id}
                 submissionID={id}
                 onChange={(data) => {
-                  const newData: string[] = [
-                    (data.data?.khhdon_first ?? " ") +
-                      (data.data?.khhdon_last ?? ""),
-                    data.data?.shdon ?? "",
-                    data.data?.tgtttbso ?? "",
-                    data.data?.nbmst ?? "",
-                    data.data?.nbten ?? "",
-                    data.bonus?.hddt.status?.toString() ?? "",
-                    getEInvoiceNote(data.bonus?.hddt) ?? "",
-                    "",
-                    data.data?.nmten ?? "",
-                    "",
-                    "",
-                    data.bonus?.time ?? "",
-                  ]
+                  const newData: string[] = convertValueExport(data)
                   props.updateExportData(id, newData)
                 }}
               />

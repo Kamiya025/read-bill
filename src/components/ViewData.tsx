@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import {
   IBillConfidenceScore,
   IBillForCheck,
-  IRootBillObject,
+  IEinvoiceData,
 } from "../api/model"
 import { allKeys, useGetData } from "../api/query"
 import { useCheckBillMutation } from "../hook"
@@ -49,13 +49,12 @@ function traverseDataSets(
 
 function GetDataWrapper(props: {
   submissionID: string
-  onChange: (data: { data?: IBillForCheck; bonus?: IRootBillObject }) => void
+  onChange: (data: { data?: IBillForCheck; bonus?: IEinvoiceData }) => void
 }) {
   const [dataSet, setDataSet] = useState<{
     data?: IBillForCheck
-    submit?: IBillForCheck
     score: IBillConfidenceScore
-    bonus?: IRootBillObject
+    bonus?: IEinvoiceData
   }>({
     score: {
       nbmst: 1,
@@ -140,7 +139,6 @@ function GetDataWrapper(props: {
           setDataSet({
             data,
             score,
-            submit,
           })
         } else {
           queryClient.invalidateQueries({
@@ -191,8 +189,6 @@ function GetDataWrapper(props: {
           }}
           dataSetConfidenceScore={dataSet.score}
         />
-
-        {/* <GetDataBillWrapper ref={refBillFind} params={dataSet.submit} /> */}
       </tr>
     )
   }

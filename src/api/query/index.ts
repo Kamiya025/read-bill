@@ -7,6 +7,8 @@ export const allKeys = {
     [...allKeys.all, submissionID, "getDataBySubmissionID"] as const,
   getDataBill: (params: IBillForCheck) =>
     [...allKeys.all, params, "getDataBill"] as const,
+  checkListDataBill: (params: IBillForCheck[]) =>
+    [...allKeys.all, params, "checkListDataBill"] as const,
 }
 export function useGetData(submissionID: string) {
   return useQuery({
@@ -18,5 +20,11 @@ export function useGetDataBill(params: IBillForCheck) {
   return useQuery({
     queryKey: allKeys.getDataBill(params),
     queryFn: () => uploadApi.getDataBill(params),
+  })
+}
+export function useCheckListDataBill(data: IBillForCheck[]) {
+  return useQuery({
+    queryKey: allKeys.checkListDataBill(data),
+    queryFn: () => uploadApi.checkListDataBill(data),
   })
 }

@@ -1,13 +1,27 @@
-import { useEffect, useState } from "react"
-import { IBillForCheck, IRootBillObject } from "../api/model"
-import { getEInvoiceNote } from "./common"
-import { useCheckBillMutation } from "../hook"
-import ViewBillGet, { ViewBillGet2 } from "./ViewDataGet"
+import { useEffect } from "react"
+import { IBillForCheck, IEinvoiceData } from "../api/model"
+import { useCheckListDataBill } from "../api/query"
+import { ViewBillGet2 } from "./ViewDataGet"
+import { convertValueExport } from "./common"
 
 export const TableBillExport = (props: {
-  data: IBillForCheck[] | undefined
-  updateExportData: (id: string, newData: string[]) => void
+  data: IBillForCheck[]
+  updateExportData: (value: { id: string; data: string[] }[]) => void
 }) => {
+  const check = useCheckListDataBill(props.data)
+  useEffect(() => {
+    if (check.isSuccess) {
+      props.updateExportData(
+        props.data.map((e, index) => ({
+          id: index.toString(),
+          data: convertValueExport({
+            data: e,
+            bonus: check.data.einvoices[index]?.data,
+          }),
+        }))
+      )
+    }
+  }, [check.status])
   return (
     <div className="container-table">
       <table>
@@ -21,33 +35,23 @@ export const TableBillExport = (props: {
           <th>Ghi chú</th>
           <th>Tên khách hàng mua</th>
           <th>Thời gian tra cứu</th>
-          <th className="sticky-x"></th>
         </tr>
-        {props.data ? (
+        {props.data && check.isSuccess ? (
           <>
-            {props.data.map((item, index) => (
-              <View
-                key={index}
-                data={item}
-                onChange={(bonus) => {
-                  const newData: string[] = [
-                    (item?.khhdon_first ?? " ") + (item?.khhdon_last ?? ""),
-                    item?.shdon ?? "",
-                    item?.tgtttbso ?? "",
-                    item?.nbmst ?? "",
-                    item?.nbten ?? "",
-                    bonus?.hddt.status?.toString() ?? "",
-                    getEInvoiceNote(bonus?.hddt) ?? "",
-                    "",
-                    item?.nmten ?? "",
-                    "",
-                    "",
-                    bonus?.time ?? "",
-                  ]
-                  props.updateExportData(index.toString(), newData)
-                }}
-              />
-            ))}
+            {props.data.map((item, index) => {
+              // const newData: string[] = convertValueExport({
+              //   data: item,
+              //   bonus: check.data.einvoices[index]?.data,
+              // })
+              // props.updateExportData(index.toString(), newData)
+              return (
+                <View
+                  key={index}
+                  data={item}
+                  bonus={check.data.einvoices[index]?.data}
+                />
+              )
+            })}
           </>
         ) : (
           <td colSpan={11} style={{ height: "80vh" }}>
@@ -58,28 +62,14 @@ export const TableBillExport = (props: {
     </div>
   )
 }
-function View(props: {
-  data: IBillForCheck
-  onChange: (bonus?: IRootBillObject) => void
-}) {
-  const [bonus, setBonus] = useState<IRootBillObject | undefined>(undefined)
-  const mutation = useCheckBillMutation((data) => {
-    setBonus(data)
-    props.onChange(data)
-  })
-  useEffect(() => {
-    mutation.mutate(props.data)
-  }, [props.data])
-
+function View(props: { data: IBillForCheck; bonus?: IEinvoiceData }) {
   return (
     <tr>
       <ViewBillGet2
         dataSet={props.data}
-        bonus={bonus}
-        isLoadingSubmit={mutation.isPending}
-        submit={(submit) => {
-          mutation.mutate(submit)
-        }}
+        bonus={props.bonus}
+        isLoadingSubmit={false}
+        submit={(submit) => {}}
         dataSetConfidenceScore={{ khhdon: 1, nbmst: 1, shdon: 1, tgtttbso: 1 }}
       />
     </tr>
