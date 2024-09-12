@@ -87,9 +87,11 @@ function GetDataWrapper(props: {
   )
     return (
       <tr>
-        <td colSpan={11}>
-          <div>Đang lấy dữ liệu...</div>
-        </td>
+        {[...Array(11)].map((_, index) => (
+          <td key={index}>
+            <div className="is-loading"></div>
+          </td>
+        ))}
       </tr>
     )
   if (getDataBySubmission.isError)
