@@ -238,37 +238,39 @@ export const ViewBillGet2 = (props: {
     return (
       <>
         <td>
-          <Input
-            label="Loại Hóa đơn"
-            value={dataSetSubmit.data?.khhdon_first}
-            defaultValue={dataSet?.khhdon_first}
-            onChange={(data) => {
-              setDataSetSubmit((pre) => ({
-                ...pre,
-                data: {
-                  ...(pre.data ?? dataDefault),
-                  khhdon_first: data.toUpperCase(),
-                },
-              }))
-            }}
-            score={dataSetConfidenceScore.khhdon}
-            short
-          />
-          <Input
-            label="Ký hiệu Hóa đơn"
-            value={dataSetSubmit.data?.khhdon_last}
-            defaultValue={dataSet?.khhdon_last}
-            onChange={(data) => {
-              setDataSetSubmit((pre) => ({
-                ...pre,
-                data: {
-                  ...(pre.data ?? dataDefault),
-                  khhdon_last: data.toUpperCase(),
-                },
-              }))
-            }}
-            score={dataSetConfidenceScore.khhdon}
-          />
+          <div className="flex">
+            <Input
+              label="Loại Hóa đơn"
+              value={dataSetSubmit.data?.khhdon_first}
+              defaultValue={dataSet?.khhdon_first}
+              onChange={(data) => {
+                setDataSetSubmit((pre) => ({
+                  ...pre,
+                  data: {
+                    ...(pre.data ?? dataDefault),
+                    khhdon_first: data.toUpperCase(),
+                  },
+                }))
+              }}
+              score={dataSetConfidenceScore.khhdon}
+              short
+            />
+            <Input
+              label="Ký hiệu Hóa đơn"
+              value={dataSetSubmit.data?.khhdon_last}
+              defaultValue={dataSet?.khhdon_last}
+              onChange={(data) => {
+                setDataSetSubmit((pre) => ({
+                  ...pre,
+                  data: {
+                    ...(pre.data ?? dataDefault),
+                    khhdon_last: data.toUpperCase(),
+                  },
+                }))
+              }}
+              score={dataSetConfidenceScore.khhdon}
+            />
+          </div>
         </td>
         <td>
           <Input

@@ -118,7 +118,7 @@ function App() {
           <input
             id="input-file-xlsx"
             ref={inputFileRef}
-            accept="application/xlsx"
+            accept=".xlsx,.xls"
             type="file"
             placeholder="Chọn tệp"
             onChange={handleFileXLSXUpload}

@@ -1,4 +1,9 @@
-import { Hddt, IBillForCheck, IEinvoiceData } from "../api/model"
+import {
+  Hddt,
+  IBillConfidenceScore,
+  IBillForCheck,
+  IEinvoiceData,
+} from "../api/model"
 
 export function covertCode(code: number | undefined, status?: number) {
   if (code === 0) return "Hóa đơn không tồn tại"
@@ -58,6 +63,53 @@ export function getEInvoiceNote(hddt: Hddt | undefined): string {
 export const checkValidate = (data?: IBillForCheck) => {
   return data && data.nbmst && data.khhdon_last && data.shdon && data.tgtttbso
 }
+export const checkValidateScore = (data?: IBillConfidenceScore) => {
+  return (
+    data &&
+    data.nbmst > 0.9 &&
+    data.khhdon > 0.9 &&
+    data.shdon > 0.9 &&
+    data.tgtttbso > 0.9
+  )
+}
+export function traverseDataSets(
+  dataSets: any[],
+  tag = "",
+  output: Record<
+    string,
+    {
+      value: string
+      normalized_value: any
+      label: string
+      display_name: string
+      confidence_score: number
+    }
+  >
+) {
+  if (!dataSets) return
+  dataSets.forEach(
+    ({
+      service_label,
+      data_set,
+      value,
+      normalized_value,
+      confidence_score,
+    }) => {
+      const newTag = tag ? `${tag}.${service_label.label}` : service_label.label
+      if (data_set) {
+        traverseDataSets(data_set, newTag, output)
+      } else {
+        output[newTag] = {
+          value,
+          normalized_value,
+          label: newTag,
+          display_name: service_label.display_name,
+          confidence_score,
+        }
+      }
+    }
+  )
+}
 export const convertValueExport = (data: {
   data?: IBillForCheck
   bonus?: IEinvoiceData
@@ -76,4 +128,30 @@ export const convertValueExport = (data: {
     "",
     data.bonus?.time ?? "",
   ]
+}
+export const convertValueOutput = (output: any) => {
+  return {
+    data: {
+      nbmst: output["supplier_data.tax_code"]?.value ?? "",
+      khhdon_first: output["invoice_data.serial_no"]?.value?.charAt(0) ?? "",
+      khhdon_last: output["invoice_data.serial_no"]?.value?.substring(1) ?? "",
+      shdon: output["invoice_data.invoice_no"]?.value ?? "",
+      tgtttbso: output["invoice_data.total_amount"]?.value
+        ? String(Math.floor(Number(output["invoice_data.total_amount"]?.value)))
+        : String(Math.floor(Number(output["invoice_data.sub_total"]?.value))),
+      nbten: output["supplier_data.supplier"]?.value ?? "",
+      nmten:
+        output["purchaser_data.purchaser_name"]?.value ??
+        output["purchaser_data.buyer_name"]?.value ??
+        "",
+    },
+    score: {
+      nbmst: output["supplier_data.tax_code"]?.confidence_score ?? 0,
+      khhdon: output["invoice_data.serial_no"]?.confidence_score ?? 0,
+      shdon: output["invoice_data.invoice_no"]?.confidence_score ?? 0,
+      tgtttbso: output["invoice_data.total_amount"]?.value
+        ? output["invoice_data.total_amount"]?.confidence_score ?? 0
+        : output["invoice_data.sub_total"]?.confidence_score ?? 0,
+    },
+  }
 }

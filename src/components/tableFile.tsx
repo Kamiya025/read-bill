@@ -23,18 +23,16 @@ export const TableBill = (props: {
           <th className="sticky-x"></th>
         </tr>
         {props.submissionsID && props.mutation.isSuccess ? (
-          <>
-            {props.submissionsID.map((id) => (
-              <GetDataWrapper
-                key={id}
-                submissionID={id}
-                onChange={(data) => {
-                  const newData: string[] = convertValueExport(data)
-                  props.updateExportData(id, newData)
-                }}
-              />
-            ))}
-          </>
+          props.submissionsID.map((id) => (
+            <GetDataWrapper
+              key={id}
+              submissionID={id}
+              onChange={(data) => {
+                const newData: string[] = convertValueExport(data)
+                props.updateExportData(id, newData)
+              }}
+            />
+          ))
         ) : (
           <td colSpan={11} style={{ height: "80vh" }}>
             <div className="table-empty">Hãy chọn file trước</div>
