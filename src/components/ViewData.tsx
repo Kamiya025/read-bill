@@ -5,7 +5,7 @@ import {
   IBillForCheck,
   IEinvoiceData,
 } from "../api/model"
-import { allKeys, useGetData } from "../api/query"
+import { useGetData } from "../api/query"
 import { useCheckBillMutation } from "../hook"
 import ViewBillGet from "./ViewDataGet"
 import {
@@ -46,14 +46,12 @@ function GetDataWrapper(props: {
   }, [dataSet])
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined
-
     const refetch = () => {
       if (interval) clearInterval(interval) // clear any existing interval
       interval = setInterval(() => {
         getDataBySubmission.refetch()
       }, debounce)
     }
-
     const fetchData = () => {
       let document = getDataBySubmission.data?.documents[0]
       let output = Object.create(null)
@@ -89,7 +87,7 @@ function GetDataWrapper(props: {
       <tr>
         {[...Array(11)].map((_, index) => (
           <td key={index}>
-            <div className="is-loading"></div>
+            <div className="is-loading" />
           </td>
         ))}
       </tr>

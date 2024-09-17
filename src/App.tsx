@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react"
-import { TableBill } from "./components/tableFile"
-import { addDataToExcelFile, readFile, useUploadMutation } from "./hook"
-import "./style/App.css"
 import { IBillForCheck } from "./api/model"
+import { TableBill } from "./components/tableFile"
 import { TableBillExport } from "./components/tableFileExport"
+import {
+  addDataToExcelFile,
+  useReadFileMutation,
+  useUploadMutation,
+} from "./hook"
+import "./style/App.css"
 
 function App() {
   const [submissionsID, setSubmissionsID] = useState<string[] | undefined>(
@@ -19,6 +23,7 @@ function App() {
     IBillForCheck[] | undefined
   >(undefined)
   const inputFileRef = useRef<HTMLInputElement | null>(null)
+  const mutationCheckFile = useReadFileMutation(setDataFileImported)
   useEffect(() => {
     document.title = "Danh sách hóa đơn VAT"
   }, [])
@@ -63,35 +68,15 @@ function App() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files ? e.target.files[0] : null
-
+    clearAllState()
     if (!file) {
       alert("Please select a file first!")
-      clearAllState()
       return
     }
-
-    // Reset state trước khi bắt đầu quá trình đọc file
-    setSubmissionsID(undefined)
-    setExportData([])
-    setFilesSelected(undefined)
-    setDataFileImported(undefined)
-
-    try {
-      // Gọi hàm readFile để đọc và xử lý dữ liệu từ file Excel
-      const data = await readFile(file)
-      setDataFileImported(data) // Cập nhật dữ liệu đã đọc được
-      // setExportData(
-      //   data?.map((_, index) => ({
-      //     id: index.toString(),
-      //     data: [] as string[],
-      //   })) ?? []
-      // ) // Cập nhật dữ liệu để xuất ra
-      if (inputFileRef.current) {
-        inputFileRef.current.value = "" // Làm trống input sau khi chọn file
-      }
-    } catch (error) {
-      console.error("Error reading the Excel file:", error)
-      alert("There was an error reading the file. Please try again.")
+    setDataFileImported([])
+    mutationCheckFile.mutate(file)
+    if (inputFileRef.current) {
+      inputFileRef.current.value = ""
     }
   }
 
@@ -181,10 +166,7 @@ function App() {
                     window.open(URL.createObjectURL(file), "_blank")
                   }}
                 >
-                  <img
-                    src={URL.createObjectURL(file)}
-                    // alt="Uploaded file preview"
-                  />
+                  <img src={URL.createObjectURL(file)} />
                   <div>{file.name}</div>
                 </label>
               ))}
@@ -226,6 +208,7 @@ function App() {
             <TableBillExport
               data={dataFileImported}
               updateExportData={setExportData}
+              isLoading={mutationCheckFile.isPending}
             />
           ) : (
             <TableBill

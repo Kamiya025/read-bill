@@ -30,9 +30,7 @@ export const useCheckBillMutation = (
 ) => {
   return useMutation<IEinvoiceData, AxiosError, IBillForCheck>({
     mutationFn: (formData) => uploadApi.getDataBill(formData),
-    onError: (error: AxiosError) => {
-      // alert("Kiểm tra thông tin thất bại")
-    },
+    onError: (error: AxiosError) => {},
     onSuccess: (data: IEinvoiceData, variables) => {
       if (data.hddt) {
         onSuccess(data, variables)
@@ -42,26 +40,11 @@ export const useCheckBillMutation = (
     },
   })
 }
-
 const copyRowStyle = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
   sourceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
     const targetCell = targetRow.getCell(colNumber)
     targetCell.value = ""
     targetCell.style = JSON.parse(JSON.stringify(cell.style)) // Sao chép toàn bộ style từ cell nguồn
-  })
-}
-const copyRow = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
-  sourceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-    const targetCell = targetRow.getCell(colNumber)
-    targetCell.value = cell.value
-    targetCell.style = JSON.parse(JSON.stringify(cell.style)) // Sao chép toàn bộ style từ cell nguồn
-  })
-}
-const repalceValueRow = (sourceRow: ExcelJS.Row, targetRow: ExcelJS.Row) => {
-  sourceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-    const targetCell = targetRow.getCell(colNumber)
-    targetCell.value = cell.value
-    targetCell.style = JSON.parse(JSON.stringify(targetCell.style)) // Sao chép toàn bộ style từ cell nguồn
   })
 }
 export const addDataToExcelFile = async (
@@ -119,9 +102,7 @@ export async function readFile(file: File): Promise<IBillForCheck[]> {
 
     if (indexSheetTemplate >= 0) {
       const sheet = workbook.Sheets[workbook.SheetNames[indexSheetTemplate]]
-      // Chuyển dữ liệu từ sheet thành JSON
       let data = XLSX.utils.sheet_to_json<any>(sheet)
-      // Xử lý dữ liệu theo yêu cầu
 
       listData = data.map((val: any) => ({
         nbmst: val["Mã số thuế Đơn vị phát hành "] ?? "",
@@ -139,6 +120,20 @@ export async function readFile(file: File): Promise<IBillForCheck[]> {
     console.error("Error reading file:", error)
     return []
   }
+}
+
+export const useReadFileMutation = (
+  onSuccess: (data: IBillForCheck[]) => void
+) => {
+  return useMutation<IBillForCheck[], AxiosError, File>({
+    mutationFn: (formData) => readFile(formData),
+    onError: (error: AxiosError) => {
+      console.error("Error processing file:", error.message)
+    },
+    onSuccess: (data, variables) => {
+      onSuccess(data)
+    },
+  })
 }
 
 function createFileDownload(blob: Blob, nameFile: string) {

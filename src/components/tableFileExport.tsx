@@ -7,6 +7,7 @@ import { convertValueExport } from "./common"
 export const TableBillExport = (props: {
   data: IBillForCheck[]
   updateExportData: (value: { id: string; data: string[] }[]) => void
+  isLoading: boolean
 }) => {
   const check = useCheckListDataBill(props.data)
   useEffect(() => {
@@ -22,6 +23,7 @@ export const TableBillExport = (props: {
       )
     }
   }, [check.status])
+
   return (
     <div className="container-table">
       <table>
@@ -36,25 +38,26 @@ export const TableBillExport = (props: {
           <th>Tên khách hàng mua</th>
           <th>Thời gian tra cứu</th>
         </tr>
-        {props.data && check.isSuccess ? (
-          <>
-            {props.data.map((item, index) => {
-              // const newData: string[] = convertValueExport({
-              //   data: item,
-              //   bonus: check.data.einvoices[index]?.data,
-              // })
-              // props.updateExportData(index.toString(), newData)
-              return (
-                <View
-                  key={index}
-                  data={item}
-                  bonus={check.data.einvoices[index]?.data}
-                />
-              )
-            })}
-          </>
+        {props.isLoading || check.isLoading ? (
+          props.data?.map((_, index) => (
+            <tr key={index}>
+              {[...Array(9)].map((_, index) => (
+                <td key={index}>
+                  <div className="is-loading" />
+                </td>
+              ))}
+            </tr>
+          ))
+        ) : props.data && check.isSuccess ? (
+          props.data.map((item, index) => (
+            <View
+              key={index}
+              data={item}
+              bonus={check.data.einvoices[index]?.data}
+            />
+          ))
         ) : (
-          <td colSpan={11} style={{ height: "80vh" }}>
+          <td colSpan={9} style={{ height: "80vh" }}>
             <div className="table-empty">Hãy chọn file trước</div>
           </td>
         )}

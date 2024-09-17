@@ -154,10 +154,28 @@ export const ViewBillGet = (props: {
           />
         </td>
         <td>{dataSetSubmit.data?.nbten ?? ""}</td>
-        <td>{props.bonus?.hddt?.status}</td>
-        <td className="note">{getEInvoiceNote(props.bonus?.hddt)}</td>
+        <td>
+          {props.isLoadingSubmit ? (
+            <div className="is-loading" />
+          ) : (
+            props.bonus?.hddt?.status
+          )}
+        </td>
+        <td className="note">
+          {props.isLoadingSubmit ? (
+            <div className="is-loading" />
+          ) : (
+            getEInvoiceNote(props.bonus?.hddt)
+          )}
+        </td>
         <td>{props.dataSet?.nmten ?? ""}</td>
-        <td>{props.bonus?.time}</td>
+        <td>
+          {props.isLoadingSubmit ? (
+            <div className="is-loading" />
+          ) : (
+            props.bonus?.time
+          )}
+        </td>
         <td className="sticky-x">
           {!props.isLoadingSubmit && checkValidate(dataSetSubmit.data) ? (
             <button
@@ -186,7 +204,7 @@ export const ViewBillGet = (props: {
               </svg>
             </button>
           ) : (
-            <div className="submit-none" />
+            <div className="submit-none is-loading" />
           )}
         </td>
       </>
